@@ -600,16 +600,25 @@ const slugJS = s => low(s).replace(/\.[a-z0-9]{2,4}$/, '').replace(/[^a-z0-9]+/g
 function chooseTrack(p, g){ return pisteDuSoir(); }
 
 const bSon = $('#bSon');
-bSon.addEventListener('click', () => {
-  if(!Snd.on){ Snd.on = true; if(Snd.init()) try{ Snd.ctx.resume(); }catch(e){} Music.play(curTrack, curMode); Music.unlock();
-    document.querySelectorAll('.invite-son').forEach(b => b.remove()); }
-  else { Snd.on = false; Snd.stopIdle(); Music.stop(); setTimeout(() => { if(!Snd.on) try{ Snd.ctx.suspend(); }catch(e){} }, 1300); }
+const majSon = () => {
   bSon.setAttribute('aria-pressed', String(Snd.on));
   bSon.setAttribute('aria-label', Snd.on ? 'Couper le son et la musique' : 'Activer le son et la musique');
   bSon.querySelector('.w1').style.display = Snd.on ? '' : 'none';
   bSon.querySelector('.x1').style.display = Snd.on ? 'none' : '';
+};
+// Réveille le son (le téléphone exige un toucher avant toute musique)
+const reveilSon = () => {
+  if(!Snd.on) return;
+  if(Snd.init()) try{ Snd.ctx.resume(); }catch(e){}
+  Music.unlock(); if(curTrack) Music.play(curTrack, curMode);
+  document.querySelectorAll('.invite-son').forEach(b => b.remove());
+};
+bSon.addEventListener('click', () => {
+  if(!Snd.on){ Snd.on = true; reveilSon(); }
+  else { Snd.on = false; Snd.stopIdle(); Music.stop(); setTimeout(() => { if(!Snd.on) try{ Snd.ctx.suspend(); }catch(e){} }, 1300); }
+  S.muet = !Snd.on; saveS();   // son choix est gardé pour les prochaines visites
+  majSon();
 });
-bSon.querySelector('.w1').style.display = 'none';
 
 /* =========================================================
    MODE TEST (invisible sans ?test=1)
@@ -655,6 +664,16 @@ if(!Array.isArray(S.rows)) S.rows = [];
 function saveS(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 const isRead = d => S.lus.includes(d);
 function markRead(d){ if(!isRead(d)){ S.lus.push(d); saveS(); } }
+/* Son activé par défaut, partout, sauf si elle l'a coupé elle-même (bouton en haut à droite).
+   Le téléphone ne laisse jouer la musique qu'après un premier toucher : on la lance à ce moment-là. */
+Snd.on = !S.muet; majSon();
+let sonReveille = false;
+const premierToucher = e => {
+  if(sonReveille) return;
+  if(e.target && e.target.closest && e.target.closest('#bSon')) return;   // le bouton son gère lui-même
+  sonReveille = true; reveilSon();
+};
+['pointerdown', 'keydown', 'touchend'].forEach(t => document.addEventListener(t, premierToucher, true));
 
 /* =========================================================
    LECTURE DU CSV PUBLIÉ
@@ -1344,7 +1363,7 @@ function showIntro(){
   const go = el('button', 'lbtn rouge', 'Ouvrir le grimoire'); go.type = 'button'; go.style.marginTop = '22px';
   const skip = el('button', 'rap-non', 'Passer l\'introduction'); skip.type = 'button';
   go.onclick = () => {
-    if(!Snd.on) bSon.click();   // elle a choisi la vidéo avec le son : la musique suivra dans le grimoire
+    reveilSon();   // la musique suivra dans le grimoire (sauf si elle a coupé le son)
     const src = 'intro-' + (pisteDuSoir() || MUSIQUES[0]).fichier.replace(/\.mp3$/, '') + '.mp4';
     const w = el('div', 'intro-v');
     w.innerHTML = '<video playsinline preload="auto" src="' + src + '" aria-describedby="intro-txt"></video>'
@@ -1352,6 +1371,7 @@ function showIntro(){
       + '<p id="intro-txt" class="sr-only">Une bougie s’allume près d’une lettre scellée de cire rouge, frappée d’une rose. La cire fond, l’enveloppe s’ouvre. Sur la lettre, à l’encre : Bienvenue, princesse. Ce grimoire est à toi. Chaque soir, à 21 h, une page s’éveille. Un geste, une citation, un mot de moi. Un moment rien qu’à toi. Aujourd’hui, quelqu’un a pensé à toi. Demain aussi. Une rose se dessine, signé Dieu.</p>';
     document.body.append(w);
     const v = w.querySelector('video');
+    v.muted = !Snd.on;   // si elle a coupé le son, la vidéo reste muette aussi
     v.onended = done; v.onerror = done;
     w.querySelector('.intro-skip').onclick = done;
     const pr = v.play();
