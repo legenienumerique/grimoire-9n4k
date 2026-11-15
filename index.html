@@ -1287,8 +1287,8 @@ function showIntro(){
     w.innerHTML = '<video playsinline preload="auto" src="intro.mp4" aria-describedby="intro-txt"></video>'
       + '<button class="intro-skip" type="button">Passer</button>'
       + '<p id="intro-txt" class="sr-only">Une moto roule de nuit. Dans la lumière du phare : Bienvenue, princesse. Ce grimoire est à toi. '
-      + 'Chaque soir, à 21 h, une page s'éveille. Un geste, une citation, un mot de moi. Un moment rien qu'à toi, pour souffler. '
-      + 'La moto s'arrête devant un grimoire qui s'ouvre : Aujourd'hui, quelqu'un a pensé à toi. Demain aussi. Dieu.</p>';
+      + 'Chaque soir, à 21 h, une page s’éveille. Un geste, une citation, un mot de moi. Un moment rien qu’à toi, pour souffler. '
+      + 'La moto s’arrête devant un grimoire qui s’ouvre : Aujourd’hui, quelqu’un a pensé à toi. Demain aussi. Dieu.</p>';
     document.body.append(w);
     const v = w.querySelector('video');
     v.onended = done; v.onerror = done;
