@@ -728,6 +728,7 @@ function build(rows, ok){
 }
 
 let booting = null;
+let introOn = false;   // pendant l'écran d'intro, rien d'autre ne s'affiche par-dessus
 function boot(){
   if(booting) return booting;
   booting = (async () => {
@@ -749,6 +750,7 @@ function screen(){
 }
 
 function route(){
+  if(introOn) return;
   const h = location.hash;
   if(h === '#sommaire' && ST.list.length) return showSommaire();
   const m = h.match(/^#page-(\d+)$/);
@@ -1269,15 +1271,30 @@ document.addEventListener('visibilitychange', () => { if(!document.hidden && ST.
    mais pas quand elle recharge la page ou navigue dedans pendant la même visite.
    Un toucher est nécessaire pour que le téléphone accepte le son. */
 const INTRO_KEY = T.test ? 'grimoire.test.intro' : 'grimoire.intro';
-const introVue = () => { try{ return sessionStorage.getItem(INTRO_KEY) === '1'; }catch(e){ return false; } };
+// Déjà vue dans cette visite ET simple rechargement / retour arrière : on ne la relance pas.
+// Lien rouvert (même dans le même onglet), nouvel onglet : elle revient.
+const introVue = () => {
+  let vue = false; try{ vue = sessionStorage.getItem(INTRO_KEY) === '1'; }catch(e){}
+  let nav = ''; try{ nav = (performance.getEntriesByType('navigation')[0] || {}).type || ''; }catch(e){}
+  return vue && (nav === 'reload' || nav === 'back_forward');
+};
+// Retour sur un onglet resté ouvert après 30 min ou plus d'absence : c'est une nouvelle arrivée.
+let cacheDepuis = 0;
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden){ cacheDepuis = Date.now(); return; }
+  if(cacheDepuis && Date.now() - cacheDepuis >= 30 * 60 * 1000 && !document.querySelector('.intro-v') && T.intro !== '0'){
+    cacheDepuis = 0; showIntro();
+  }
+});
 function showIntro(){
+  introOn = true;
   screen();
   const d = el('section', 'screen');
   d.innerHTML = CAT_SLEEP + '<h1 class="msg">' + (S.intro ? 'Ton grimoire t\'attend, princesse.' : 'Un grimoire t\'attend, princesse.') + '</h1>'
     + '<p class="sur">' + (S.intro ? 'La lettre, avant la page du soir : 30 secondes, avec le son.' : 'Une petite vidéo de bienvenue : 30 secondes, avec le son.') + '</p>';
   let fini = false;
   const done = () => {
-    if(fini) return; fini = true;
+    if(fini) return; fini = true; introOn = false;
     S.intro = 1; saveS();
     try{ sessionStorage.setItem(INTRO_KEY, '1'); }catch(e){}
     const w = document.querySelector('.intro-v');
