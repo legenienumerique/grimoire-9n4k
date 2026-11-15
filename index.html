@@ -1062,7 +1062,7 @@ function buildToi(p, box){
       const dansInsta = /Instagram/i.test(navigator.userAgent);
       const ou = dansInsta
         ? 'ferme cette page (la croix en haut) pour revenir dans notre conversation'
-        : 'sur le profil de Dieu qui s\'ouvre, touche « Écrire »';
+        : 'appuie sur « Ouvrir Instagram » ci-dessous, puis touche « Écrire » sur le profil de Dieu';
       merci.textContent = (ok ? 'Tes mots sont copiés. ' : 'Copie tes mots ci-dessous (appui long sur le texte). ')
         + 'Ensuite, ' + ou + ', appuie longuement dans la zone de message puis « Coller ».';
       // Ses mots restent visibles (au cas où la copie n'a pas marché) + le lien vers le profil
