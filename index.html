@@ -764,7 +764,8 @@ $('#bSom').addEventListener('click', () => { location.hash = 'sommaire'; });
 function tonight(){
   if(!ST.un) return showSleep();
   const p = ST.list.find(x => x.date === ST.today);
-  if(p) return showPage(p, {});
+  // La page du soir rejoue toujours le geste, même déjà lue (consigne : tout le parcours à chaque arrivée)
+  if(p) return showPage(p, {replay:true});
   if(!ST.ok && ST.list.length){
     const read = ST.list.filter(x => isRead(x.date));
     return showPage(read[read.length - 1] || ST.list[ST.list.length - 1], {note:'La page de ce soir arrive bientôt.'});
