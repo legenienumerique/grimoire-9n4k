@@ -176,6 +176,9 @@ button{font:inherit;color:inherit}
 .rap-b .lbtn{margin:0;display:flex;align-items:center;justify-content:center;text-decoration:none}
 .rap-non{display:block;margin:8px auto 0;min-height:44px;padding:0 12px;background:none;border:0;color:var(--muted);font-family:var(--sans);font-size:.82rem;text-decoration:underline;cursor:pointer}
 .rappel .merci{margin:0}
+.ig-aide{margin:12px 0 4px;text-align:center}
+.ig-aide .ig-txt{margin:0 0 12px;padding:12px 14px;border:1px dashed rgba(201,169,110,.35);border-radius:12px;text-align:left;white-space:pre-line;font-size:.95rem;-webkit-user-select:text;user-select:text}
+.ig-aide .lbtn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 .intro-v{position:fixed;inset:0;z-index:60;background:#000;display:flex;align-items:center;justify-content:center}
 .intro-v video{width:100%;height:100%;object-fit:contain;background:#000}
 .intro-skip{position:absolute;top:max(16px,env(safe-area-inset-top));right:16px;min-height:44px;padding:0 18px;border-radius:999px;
@@ -1037,16 +1040,36 @@ function buildToi(p, box){
   const mk = (txt, cls, fn) => { const b = el('button', 'lbtn ' + (cls || ''), txt); b.type = 'button'; b.onclick = fn; env.append(b); return b; };
   let num = ''; try{ num = atob(NUMERO_DIEU_MASQUE || '').split('').reverse().join('').replace(/\D/g, ''); }catch(e){}
   const ig = String(INSTAGRAM_DIEU || '').replace(/^@/, '').trim();
+  // Copie fiable, y compris dans le navigateur intégré d'Instagram (sans presse-papiers moderne)
+  const copier = t => {
+    try{ if(navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(t).catch(() => {}); } }catch(e){}
+    try{
+      const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px'; document.body.append(ta);
+      ta.focus(); ta.select(); ta.setSelectionRange(0, t.length);
+      const ok = document.execCommand('copy'); ta.remove(); if(ok) return true;
+    }catch(e){}
+    return !!(navigator.clipboard && window.isSecureContext);
+  };
   const sendBtns = [];
   if(ig || num){
     if(ig) sendBtns.push(mk('Envoyer à Dieu sur Instagram', 'rouge', () => {
       const t = compose(); if(!t) return;
-      // Instagram ne permet pas de pré-remplir un message : on copie ses mots, elle n'a plus qu'à coller
-      let copie = null; try{ copie = navigator.clipboard ? navigator.clipboard.writeText(t) : null; }catch(e){}
-      window.open('https://ig.me/m/' + encodeURIComponent(ig), '_blank', 'noopener');
+      // Instagram ne permet pas de pré-remplir un message (et ig.me/m/ ne marche que pour les comptes pro) :
+      // on copie ses mots, puis elle les colle dans la conversation.
+      const ok = copier(t);
       sent();
-      merci.textContent = 'Tes mots sont copiés : dans la conversation, appuie longuement puis « Coller ». Ils restent aussi gardés ici.';
-      if(copie) copie.catch(() => { merci.textContent = 'La conversation s\'ouvre. Tes mots sont gardés ici, tu peux les recopier.'; });
+      const dansInsta = /Instagram/i.test(navigator.userAgent);
+      const ou = dansInsta
+        ? 'ferme cette page (la croix en haut) pour revenir dans notre conversation'
+        : 'sur le profil de Dieu qui s\'ouvre, touche « Écrire »';
+      merci.textContent = (ok ? 'Tes mots sont copiés. ' : 'Copie tes mots ci-dessous (appui long sur le texte). ')
+        + 'Ensuite, ' + ou + ', appuie longuement dans la zone de message puis « Coller ».';
+      // Ses mots restent visibles (au cas où la copie n'a pas marché) + le lien vers le profil
+      let aide = box.querySelector('.ig-aide');
+      if(!aide){ aide = el('div', 'ig-aide'); merci.after(aide); }
+      aide.innerHTML = '<p class="ig-txt"></p>' + (dansInsta ? '' : '<a class="lbtn rouge" href="https://www.instagram.com/' + encodeURIComponent(ig) + '/">Ouvrir Instagram</a>');
+      aide.querySelector('.ig-txt').textContent = t;
     }));
     if(num) sendBtns.push(mk('Envoyer par SMS', ig ? '' : 'rouge', () => { const t = compose(); if(!t) return; location.href = 'sms:+' + num + (IOS ? '&' : '?') + 'body=' + encodeURIComponent(t); sent(); }));
     sur.textContent = 'Rien ne part sans toi : le bouton ouvre ta conversation avec Dieu, tu peux relire, changer, ou ne pas envoyer.'
