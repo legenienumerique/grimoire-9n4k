@@ -38,18 +38,25 @@ const TEXTE_FINAL = "";
 /* MUSIQUES:DEBUT (liste générée automatiquement) */
 const MUSIQUES = [
   {
-    "fichier": "desire.mp3",
-    "titre": "Meg Myers - Desire [Hucci Remix]",
-    "ambiance": "douce",
-    "calme": 114.5,
-    "envol": 131.0
+    "fichier": "camila-cabello-shameless.mp3",
+    "titre": "Camila Cabello - Shameless",
+    "ambiance": "intense",
+    "calme": 107.0,
+    "envol": 140.5
   },
   {
-    "fichier": "let-the-world-burn.mp3",
-    "titre": "Chris Grey - LET THE WORLD BURN",
-    "ambiance": "intense",
-    "calme": 34.0,
-    "envol": 46.5
+    "fichier": "chase-atlantic-slow-down.mp3",
+    "titre": "Chase Atlantic - Slow Down",
+    "ambiance": "douce",
+    "calme": 85.0,
+    "envol": 99.5
+  },
+  {
+    "fichier": "ruelle-the-other-side.mp3",
+    "titre": "Ruelle - The Other Side",
+    "ambiance": "douce",
+    "calme": 22.0,
+    "envol": 69.5
   }
 ];
 /* MUSIQUES:FIN */
@@ -482,6 +489,9 @@ const Music = {
     try{ Snd.ctx.resume(); }catch(e){}
     const a = this.els[this.idx];
     if(this.cur === track && !a.paused){ this.ramp(this.idx, this.vol(), 2); return; }
+    // Juste après l'intro : la chanson continue là où la vidéo l'a laissée
+    const s = this.suite; this.suite = null;
+    if(s && s.track === track) return this.start(track, s.at, .8, mode);
     this.start(track, mode === 'plein' ? Math.max(0, track.envol - 1) : track.calme, 2.5, mode);
   },
   // La citation apparaît : on enchaîne sur l'envolée (ou on monte le volume si on y est déjà)
@@ -513,11 +523,26 @@ function music(track, mode){ curTrack = track; curMode = mode; if(track) Music.p
 /* Accueil, grimoire endormi, encre pas sèche, sommaire : une chanson douce, tout bas,
    sur son passage calme. Elle change chaque jour. */
 const VOL_NUIT = .22;
-function nuitTrack(){
+function nuitTrack(){ return pisteDuSoir(); }
+/* Une musique par visite (consigne d'Eliott) : tirée au sort à chaque arrivée, jamais la même
+   que la visite d'avant. La même sert pour l'intro, le grimoire endormi, le geste et le mot du soir.
+   Un rechargement pendant la visite la garde. */
+let piste = null;
+const PISTE_KEY = () => T.test ? 'grimoire.test.piste' : 'grimoire.piste';
+function nouvellePiste(){
   if(!MUSIQUES.length) return null;
-  const pool = MUSIQUES.filter(m => m.ambiance === 'douce'), L = pool.length ? pool : MUSIQUES;
-  const j = Math.abs(daysBetween('2026-01-01', iso(clock())));
-  return L[j % L.length];
+  const forcee = T.musique && MUSIQUES.find(m => m.fichier.includes(slugJS(T.musique)));
+  const autres = MUSIQUES.filter(m => m.fichier !== S.piste), L = autres.length ? autres : MUSIQUES;
+  piste = forcee || L[Math.floor(Math.random() * L.length)];
+  S.piste = piste.fichier; saveS();
+  try{ sessionStorage.setItem(PISTE_KEY(), piste.fichier); }catch(e){}
+  return piste;
+}
+function pisteDuSoir(){
+  if(piste) return piste;
+  let f = ''; try{ f = sessionStorage.getItem(PISTE_KEY()) || ''; }catch(e){}
+  piste = MUSIQUES.find(m => m.fichier === f) || null;
+  return piste || nouvellePiste();
 }
 function inviteSon(d){
   if(Snd.on || !MUSIQUES.length) return;
@@ -566,26 +591,10 @@ function inviteRappel(where){
   where.append(box);
 }
 
-/* Choix de la musique d'un soir :
-   colonne « musique » du Sheet = un nom de fichier (ex. Desire) ou une ambiance (douce / intense) ;
-   sinon l'ambiance du geste. Elles tournent d'un soir à l'autre. */
+/* Musique d'un soir : celle de la visite, quel que soit le soir (la colonne « musique » du Sheet n'est plus lue). */
 const low = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const slugJS = s => low(s).replace(/\.[a-z0-9]{2,4}$/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const INTENSES = ['sceau', 'moto', 'chat'];
-function chooseTrack(p, g){
-  if(!MUSIQUES.length) return null;
-  let mood = null; const v = (p.musique || '').trim();
-  if(v){
-    const k = low(v);
-    if(/^(douce?|calme|tendre)$/.test(k)) mood = 'douce';
-    else if(/^(intense|forte?|sombre)$/.test(k)) mood = 'intense';
-    else { const s = slugJS(v), t = MUSIQUES.find(m => s && (m.fichier.includes(s) || slugJS(m.titre).includes(s))); if(t) return t; }
-  }
-  mood = mood || (p.kind !== 'fin' && INTENSES.includes(g) ? 'intense' : 'douce');
-  const pool = MUSIQUES.filter(m => m.ambiance === mood);
-  const L = pool.length ? pool : MUSIQUES;
-  return L[(p.n - 1) % L.length];
-}
+function chooseTrack(p, g){ return pisteDuSoir(); }
 
 const bSon = $('#bSon');
 bSon.addEventListener('click', () => {
@@ -616,6 +625,8 @@ if(T.test){
   if(h){ T.h = +h[1]; T.mi = +(h[2] || 0); }
   T.rencontre = parseDate(Q.get('rencontre'));
   T.geste = +Q.get('geste') || 0;
+  T.musique = Q.get('musique') || '';
+  window.__music = () => Music;   // test seulement : pour vérifier la musique
   T.intro = Q.get('intro');   // 1 = revoir l'intro, 0 = la sauter
 }
 let OFFSET = 0;
@@ -1284,11 +1295,12 @@ let cacheDepuis = 0;
 document.addEventListener('visibilitychange', () => {
   if(document.hidden){ cacheDepuis = Date.now(); return; }
   if(cacheDepuis && Date.now() - cacheDepuis >= 30 * 60 * 1000 && !document.querySelector('.intro-v') && T.intro !== '0'){
-    cacheDepuis = 0; showIntro();
+    cacheDepuis = 0; nouvellePiste(); showIntro();
   }
 });
 function showIntro(){
   introOn = true;
+  music(null);
   screen();
   const d = el('section', 'screen');
   d.innerHTML = CAT_SLEEP + '<h1 class="msg">' + (S.intro ? 'Ton grimoire t\'attend, princesse.' : 'Un grimoire t\'attend, princesse.') + '</h1>'
@@ -1299,14 +1311,20 @@ function showIntro(){
     S.intro = 1; saveS();
     try{ sessionStorage.setItem(INTRO_KEY, '1'); }catch(e){}
     const w = document.querySelector('.intro-v');
-    if(w){ const v = w.querySelector('video'); try{ v.pause(); }catch(e){} w.remove(); }
+    if(w){
+      const v = w.querySelector('video'), pos = v.currentTime || 0, t = pisteDuSoir(); try{ v.pause(); }catch(e){} w.remove();
+      // La vidéo place l'envolée de la chanson à 26 s : le grimoire reprend la chanson au même endroit
+      if(t && pos > 1) Music.suite = {track:t, at:Math.max(0, t.envol - 26) + pos};
+    }
     boot();
   };
   const go = el('button', 'lbtn rouge', 'Ouvrir le grimoire'); go.type = 'button'; go.style.marginTop = '22px';
   const skip = el('button', 'rap-non', 'Passer l\'introduction'); skip.type = 'button';
   go.onclick = () => {
+    if(!Snd.on) bSon.click();   // elle a choisi la vidéo avec le son : la musique suivra dans le grimoire
+    const src = 'intro-' + (pisteDuSoir() || MUSIQUES[0]).fichier.replace(/\.mp3$/, '') + '.mp4';
     const w = el('div', 'intro-v');
-    w.innerHTML = '<video playsinline preload="auto" src="intro.mp4" aria-describedby="intro-txt"></video>'
+    w.innerHTML = '<video playsinline preload="auto" src="' + src + '" aria-describedby="intro-txt"></video>'
       + '<button class="intro-skip" type="button">Passer</button>'
       + '<p id="intro-txt" class="sr-only">Une bougie s’allume près d’une lettre scellée de cire rouge, frappée d’une rose. La cire fond, l’enveloppe s’ouvre. Sur la lettre, à l’encre : Bienvenue, princesse. Ce grimoire est à toi. Chaque soir, à 21 h, une page s’éveille. Un geste, une citation, un mot de moi. Un moment rien qu’à toi. Aujourd’hui, quelqu’un a pensé à toi. Demain aussi. Une rose se dessine, signé Dieu.</p>';
     document.body.append(w);
@@ -1321,6 +1339,9 @@ function showIntro(){
   d.append(go, skip);
   view.append(d);
 }
+// Nouvelle visite = nouvelle musique ; un rechargement ou un retour arrière garde celle de la visite
+let navType = ''; try{ navType = (performance.getEntriesByType('navigation')[0] || {}).type || ''; }catch(e){}
+if(navType === 'reload' || navType === 'back_forward') pisteDuSoir(); else nouvellePiste();
 if((!introVue() && T.intro !== '0') || T.intro === '1') showIntro(); else boot();
 })();
 </script>
