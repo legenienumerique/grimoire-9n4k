@@ -1264,18 +1264,22 @@ if(!RM){
 // Minuit ou 21 h passés pendant que la page est ouverte : on recharge le grimoire
 setInterval(() => { if(!document.hidden && ST.key && ST.key !== iso(clock()) + '|' + unlocked()) boot(); }, 15000);
 document.addEventListener('visibilitychange', () => { if(!document.hidden && ST.key && ST.key !== iso(clock()) + '|' + unlocked()) boot(); });
-/* ---------- Première visite : la vidéo de bienvenue ----------
-   Un toucher est nécessaire pour que le téléphone accepte le son.
-   Vue (ou passée) une fois, elle ne revient plus. */
+/* ---------- À chaque arrivée : la vidéo de bienvenue (consigne d'Eliott) ----------
+   Elle revient à chaque fois qu'elle ouvre le grimoire (nouvel onglet, lien rouvert),
+   mais pas quand elle recharge la page ou navigue dedans pendant la même visite.
+   Un toucher est nécessaire pour que le téléphone accepte le son. */
+const INTRO_KEY = T.test ? 'grimoire.test.intro' : 'grimoire.intro';
+const introVue = () => { try{ return sessionStorage.getItem(INTRO_KEY) === '1'; }catch(e){ return false; } };
 function showIntro(){
   screen();
   const d = el('section', 'screen');
-  d.innerHTML = CAT_SLEEP + '<h1 class="msg">Un grimoire t\'attend, princesse.</h1>'
-    + '<p class="sur">Une petite vidéo de bienvenue : 30 secondes, avec le son.</p>';
+  d.innerHTML = CAT_SLEEP + '<h1 class="msg">' + (S.intro ? 'Ton grimoire t\'attend, princesse.' : 'Un grimoire t\'attend, princesse.') + '</h1>'
+    + '<p class="sur">' + (S.intro ? 'La lettre, avant la page du soir : 30 secondes, avec le son.' : 'Une petite vidéo de bienvenue : 30 secondes, avec le son.') + '</p>';
   let fini = false;
   const done = () => {
     if(fini) return; fini = true;
     S.intro = 1; saveS();
+    try{ sessionStorage.setItem(INTRO_KEY, '1'); }catch(e){}
     const w = document.querySelector('.intro-v');
     if(w){ const v = w.querySelector('video'); try{ v.pause(); }catch(e){} w.remove(); }
     boot();
@@ -1299,7 +1303,7 @@ function showIntro(){
   d.append(go, skip);
   view.append(d);
 }
-if((!S.intro && T.intro !== '0') || T.intro === '1') showIntro(); else boot();
+if((!introVue() && T.intro !== '0') || T.intro === '1') showIntro(); else boot();
 })();
 </script>
 </body>
