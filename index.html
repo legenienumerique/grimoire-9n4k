@@ -979,13 +979,13 @@ $('#bCiel').addEventListener('click', () => { location.hash = 'ciel'; });
 /* ---------- La vidéo des nouveautés ----------
    Proposée une fois, à sa première arrivée (à toute heure), avant le reste.
    Ensuite, elle peut la revoir quand elle veut : Sommaire, Ton ciel, grimoire endormi. */
-const NOUVEAUTES = { date:'2026-11-17', video:'nouveautes.mp4' };
+const NOUVEAUTES = { date:'2026-11-17', video:'nouveautes.mp4?v=2' };
 function showNouveautes(suite, direct){
   introOn = true; music(null); screen();
   const d = el('section', 'screen');
   d.innerHTML = '<svg class="art" viewBox="-40 -40 80 80" aria-hidden="true" style="width:90px"><path d="M0 -36L7 -7 36 0 7 7 0 36 -7 7 -36 0 -7 -7Z" fill="#fff3d6" style="filter:drop-shadow(0 0 8px rgba(255,200,120,.9))"/></svg>'
     + '<h1 class="msg">Ton grimoire a grandi, princesse.</h1>'
-    + '<p class="sur">47 secondes pour découvrir ses nouveautés, avec le son. Tu pourras la revoir quand tu veux, depuis le Sommaire.</p>';
+    + '<p class="sur">Une minute et demie pour découvrir ses nouveautés, avec le son. Tu pourras la revoir quand tu veux, depuis le Sommaire.</p>';
   let fini = false;
   const done = () => {
     if(fini) return; fini = true; introOn = false; S.nouv = 1; saveS();
@@ -998,7 +998,7 @@ function showNouveautes(suite, direct){
     const w = el('div', 'intro-v nouv');
     w.innerHTML = '<video playsinline preload="auto" src="' + NOUVEAUTES.video + '" aria-describedby="nouv-txt"></video>'
       + '<button class="intro-skip" type="button">Passer</button>'
-      + '<p id="nouv-txt" class="sr-only">Ton grimoire a grandi. Quatre gestes venus de Grèce, dès la page huit : le fil d’Ariane, la lyre d’Orphée, la flèche d’Éros et l’étoile filante. Ton ciel : une étoile par page lue. Tes deux premières pages t’ont déjà offert deux étoiles de la Couronne boréale, la troisième s’allume ce soir. Sept étoiles, une constellation, et Dieu te raconte son mythe. Touche l’étoile en haut de ton grimoire. Garde-le sur ton écran d’accueil : il s’ouvre comme une vraie appli, même sans réseau. Maintenant, ta page t’attend. Dieu.</p>';
+      + '<p id="nouv-txt" class="sr-only">Ton grimoire a grandi. Les gestes qui t’attendent, un nouveau chaque soir : la moto ce soir, puis la vitre embuée, le chat noir, la bougie et la plume. Et quatre gestes venus de Grèce les soirs suivants : le fil d’Ariane, la lyre d’Orphée, la flèche d’Éros et l’étoile filante. Ton ciel : une étoile par page lue. Tes deux premières pages t’ont déjà offert deux étoiles de la Couronne boréale, la troisième s’allume ce soir. Sept étoiles, une constellation, et Dieu te raconte son mythe. Touche l’étoile en haut de ton grimoire. Garde-le sur ton écran d’accueil : il s’ouvre comme une vraie appli, même sans réseau. Maintenant, ta page t’attend. Dieu.</p>';
     document.body.append(w);
     const v = w.querySelector('video');
     v.muted = !Snd.on;
