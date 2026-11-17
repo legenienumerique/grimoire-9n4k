@@ -9,6 +9,18 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>Le Grimoire</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%80%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Grimoire">
+<script>
+/* iPhone : sans manifeste, l'icône s'ouvre sur l'adresse en cours (celle qui porte ses étoiles) */
+if(/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)){
+  const m = document.querySelector('link[rel="manifest"]'); if(m) m.remove();
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500&display=swap">
@@ -293,6 +305,94 @@ button{font:inherit;color:inherit}
 .nib{display:inline-block;width:2px;height:1em;margin-left:2px;vertical-align:-.12em;background:var(--gold);animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 
+/* 8. Le fil d'Ariane */
+.fil-s{background:radial-gradient(ellipse at 50% 40%,#1c1712,#070605 78%)}
+.fil-s svg{position:absolute;inset:0;width:100%;height:100%}
+.fil-s .mur{fill:none;stroke:rgba(201,169,110,.16);stroke-width:7;stroke-linecap:square}
+.fil-s .fil{fill:none;stroke:var(--gold);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 3px rgba(255,214,140,.8))}
+.lueur{position:absolute;width:52px;height:52px;margin:-26px 0 0 -26px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;touch-action:none}
+.lueur::before{content:"";position:absolute;inset:18px;border-radius:50%;background:rgba(201,169,110,.25);transition:background .4s,box-shadow .4s}
+.lueur.next::before{background:#ffe7b0;box-shadow:0 0 14px 4px rgba(255,214,140,.7);animation:pulse 1.3s ease-in-out infinite}
+.lueur.ok::before{background:var(--gold);box-shadow:0 0 8px rgba(255,214,140,.6)}
+.lueur.porte::after{content:"";position:absolute;left:14px;top:4px;width:24px;height:34px;border-radius:12px 12px 0 0;border:1.5px solid rgba(201,169,110,.5);border-bottom:0}
+.fil-s.out{animation:aube 1.6s ease forwards}
+@keyframes pulse{50%{transform:scale(1.35)}}
+@keyframes aube{to{background:radial-gradient(ellipse at 88% 18%,#5a4426,#120d08 70%)}}
+
+/* 9. La lyre d'Orphée */
+.lyre-s{background:radial-gradient(ellipse at 50% 35%,#1a1410,#070505 75%)}
+.lyre{position:absolute;left:50%;top:50%;width:210px;height:236px;margin:-118px 0 0 -105px;touch-action:none}
+.lyre svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.lyre .bois{fill:none;stroke:#c9a96e;stroke-width:7;stroke-linecap:round}
+.lyre .corde{stroke:rgba(242,235,224,.55);stroke-width:1.4;transition:stroke .4s}
+.lyre .corde.ok{stroke:#ffe7b0;filter:drop-shadow(0 0 3px rgba(255,214,140,.9))}
+.lyre .corde.vib{animation:vib .5s linear}
+@keyframes vib{20%{transform:translateX(2px)}40%{transform:translateX(-2px)}60%{transform:translateX(1.4px)}80%{transform:translateX(-.8px)}}
+.lyre .corde{transform-box:fill-box;transform-origin:50% 50%}
+.cbtn{position:absolute;top:58px;width:30px;height:130px;margin-left:-15px;padding:0;border:0;background:none;cursor:pointer;border-radius:8px}
+.note-v{position:absolute;font-size:1.1rem;color:var(--gold);pointer-events:none;animation:notev 1.6s ease-out forwards}
+@keyframes notev{from{opacity:1;transform:translate(0,0)}to{opacity:0;transform:translate(var(--nx),-70px)}}
+
+/* 10. La flèche d'Éros */
+.fleche-s{background:radial-gradient(ellipse at 70% 45%,#2a0c14,#070505 75%);touch-action:none}
+.fleche-s svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.arc{fill:none;stroke:var(--gold);stroke-width:4;stroke-linecap:round}
+.corde-arc{fill:none;stroke:rgba(242,235,224,.75);stroke-width:1.3}
+.coeur{transform-box:fill-box;transform-origin:50% 50%;animation:bat 1.2s ease-in-out infinite}
+.fleche-s.touche .coeur{animation:touche .9s ease forwards}
+.fleche-s.touche .coeur path{fill:#e0294a}
+@keyframes bat{0%,100%{transform:scale(1)}15%{transform:scale(1.08)}30%{transform:scale(1)}45%{transform:scale(1.05)}}
+@keyframes touche{40%{transform:scale(1.35)}100%{transform:scale(1.15)}}
+.trait{cursor:grab}
+.fleche-s .eclat{opacity:0}
+.fleche-s.touche .eclat{animation:eclat 1s ease-out forwards}
+@keyframes eclat{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(1.6)}}
+.fleche-s .eclat{transform-box:fill-box;transform-origin:50% 50%}
+
+/* 11. L'étoile filante */
+.filante-s{background:radial-gradient(ellipse at 50% 120%,#1a1530,#05050c 70%)}
+.ciel-pt{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:var(--o);animation:scint var(--t) ease-in-out infinite alternate}
+@keyframes scint{to{opacity:.12}}
+.filante{position:absolute;left:0;top:0;width:76px;height:76px;margin:-38px 0 0 -38px;padding:0;border:0;background:none;cursor:pointer;touch-action:none}
+.filante::before{content:"";position:absolute;left:32px;top:32px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 12px 4px rgba(255,240,200,.9)}
+.filante::after{content:"";position:absolute;right:38px;top:37px;width:90px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,240,200,.85));transform-origin:100% 50%;transform:rotate(var(--ang,20deg))}
+.filante-s.voeu{animation:voeu 1.8s ease forwards}
+@keyframes voeu{30%{background:radial-gradient(ellipse at 50% 50%,#4a3a6a,#05050c 70%)}100%{background:radial-gradient(ellipse at 50% 60%,#2a2142,#05050c 72%)}}
+
+/* ---------- Ton ciel (une étoile par page lue) ---------- */
+.ciel h1{margin:8px 0 4px;text-align:center;font-weight:600;font-size:2rem;color:var(--gold)}
+.ciel .sub{margin:0 0 16px;text-align:center;font-family:var(--sans);font-size:.8rem;color:var(--muted)}
+.voute{position:relative;aspect-ratio:1;max-width:440px;margin:0 auto;border-radius:18px;overflow:hidden;border:1px solid rgba(201,169,110,.2);
+  background:radial-gradient(ellipse at 50% 110%,#1b1733,#07070f 62%,#030306)}
+.voute svg{position:absolute;inset:0;width:100%;height:100%}
+.voute .fond circle{fill:#fff}
+.voute .trace{stroke:rgba(201,169,110,.55);stroke-width:.45;stroke-linecap:round;stroke-dasharray:1 1.4}
+.voute .trace.on{stroke:rgba(255,226,160,.85);stroke-dasharray:none;stroke-width:.55}
+.etoile{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;padding:0;border:0;border-radius:50%;background:none;cursor:default}
+.etoile::before{content:"";position:absolute;left:19px;top:19px;width:6px;height:6px;border-radius:50%;background:rgba(242,235,224,.28)}
+.etoile.on{cursor:pointer}
+.etoile.on::before{left:16px;top:16px;width:12px;height:12px;background:#fff6dc;box-shadow:0 0 10px 3px rgba(255,214,140,.85),0 0 24px 8px rgba(255,190,110,.25);animation:scint2 3s ease-in-out infinite alternate}
+.etoile.neuve::before{animation:naissance 1.8s ease-out both,scint2 3s 1.8s ease-in-out infinite alternate}
+@keyframes scint2{to{box-shadow:0 0 6px 2px rgba(255,214,140,.6),0 0 16px 5px rgba(255,190,110,.18)}}
+@keyframes naissance{0%{transform:scale(0);opacity:0}60%{transform:scale(2.2);opacity:1}100%{transform:scale(1)}}
+.const-nom{margin:14px 0 0;text-align:center;font-style:italic;font-size:1.5rem;color:var(--ink)}
+.const-nom small{display:block;font-family:var(--sans);font-style:normal;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.mythe{margin:18px 0 0;padding:16px 18px;border-left:2px solid var(--gold);background:rgba(201,169,110,.07);border-radius:0 12px 12px 0}
+.mythe .who{margin:0 0 6px;font-family:var(--sans);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.mythe p{margin:0;font-style:italic;font-size:1.15rem;line-height:1.45}
+.mythe .sig{margin-top:8px;text-align:right;font-weight:600;color:var(--red-text)}
+.mythe .sig::before{content:"— "}
+.attente{margin:16px 0 0;text-align:center;font-style:italic;font-size:1.1rem;color:var(--muted)}
+.consts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:20px 0 26px}
+.consts .chip[aria-pressed="true"]{border-color:var(--gold);background:rgba(201,169,110,.18);color:var(--ink)}
+.consts .chip:disabled{opacity:.35;cursor:default}
+.nouv-etoile{display:block;margin:26px auto 0;min-height:48px;padding:0 20px;border-radius:999px;border:1px solid rgba(201,169,110,.5);background:rgba(201,169,110,.1);
+  color:var(--gold);font-family:var(--sans);font-size:.88rem;cursor:pointer}
+
+/* Installer le grimoire sur l'écran d'accueil */
+.install .etapes{margin:0 0 12px;padding:0;list-style:none;text-align:left;font-family:var(--sans);font-size:.84rem;line-height:1.5;color:var(--ink)}
+.install .etapes li{margin:0 0 6px}
+
 /* Page finale : la rose */
 .bigrose{position:absolute;left:50%;top:50%;height:88%;max-width:80%;transform:translate(-50%,-50%);transition:filter 2s}
 .bigrose .rose-fill{opacity:0;transition:opacity 1.6s ease}
@@ -335,6 +435,8 @@ html.rm #petals{display:none}
     <button class="brand" id="bHome" type="button">Le Grimoire</button>
     <button class="tbtn" id="bSom" type="button" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5.5C6 4 9 4 12 6c3-2 6-2 9-.5V19c-3-1.5-6-1.5-9 .5-3-2-6-2-9-.5z"/><path d="M12 6v13.5"/></svg>Sommaire</button>
+    <button class="tbtn" id="bCiel" type="button" hidden aria-label="Ton ciel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 6.3L20.5 12l-6.3 2.7L12 21l-2.2-6.3L3.5 12l6.3-2.7z"/></svg></button>
     <button class="tbtn" id="bSon" type="button" aria-pressed="false" aria-label="Activer le son">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="w1" d="M16 9.5c1 1.4 1 3.6 0 5"/><path class="x1" d="M16.5 9.5l4 5m0-5l-4 5"/></svg></button>
   </header>
@@ -435,6 +537,9 @@ const Snd = {
       else if(name === 'paper'){ const f = this.filt('bandpass', 1500, .8); f.frequency.linearRampToValueAtTime(3800, t + .4); this.env(this.noise(.5), [f], .3, .03, .4, t); }
       else if(name === 'scratch'){ this.env(this.noise(.06), [this.filt('highpass', 3000)], .06, .003, .04, t); }
       else if(name === 'bloom'){ [523, 659, 784, 1047].forEach((f, i) => this.env(this.osc(f), [], .1, .4, 2.4, t + i * .18)); }
+      else if(name === 'pluck'){ const f = o.f || 440; const x = this.osc(f, 'triangle'); this.env(x, [this.filt('lowpass', f * 4)], .2, .003, 1.6, t); this.env(this.osc(f * 2), [], .04, .003, .7, t); }
+      else if(name === 'whoosh'){ const f = this.filt('bandpass', 900, 1.4); f.frequency.setValueAtTime(600, t); f.frequency.exponentialRampToValueAtTime(3200, t + .35); this.env(this.noise(.45), [f], .3, .03, .35, t); }
+      else if(name === 'twinkle'){ [1319, 1568, 1976, 2637].forEach((f, i) => this.env(this.osc(f), [], .06, .005, .8, t + i * .07)); }
       else if(name === 'rev'){ const x = this.osc(55, 'sawtooth'); x.frequency.setValueAtTime(55, t); x.frequency.exponentialRampToValueAtTime(150, t + .5); x.frequency.exponentialRampToValueAtTime(70, t + 1.4);
         this.env(x, [this.filt('lowpass', 700, 2)], .22, .05, 1.4, t); }
     }catch(e){}
@@ -594,6 +699,41 @@ function inviteRappel(where){
   where.append(box);
 }
 
+/* Garder le grimoire sur l'écran d'accueil, comme une appli.
+   iPhone : l'appli installée a sa propre mémoire, séparée de Safari. On glisse donc les pages lues
+   dans l'adresse (?ciel=…) : l'icône s'ouvrira sur cette adresse et retrouvera ses étoiles. */
+const STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+const DANS_APPLI = /Instagram|FBAN|FBAV|Line\/|Snapchat|TikTok/i.test(navigator.userAgent);
+const ANDROID = /Android/i.test(navigator.userAgent);
+let promptInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); promptInstall = e; });
+window.addEventListener('appinstalled', () => { S.install = 'ok'; saveS(); document.querySelectorAll('.install').forEach(b => b.remove()); });
+function majURLCiel(){
+  if(!IOS || STANDALONE || T.test || !history.replaceState) return;
+  const v = S.lus.filter(d => /^\d{4}-\d\d-\d\d$/.test(d)).map(d => d.slice(2).replace(/-/g, '')).join('.');
+  try{ history.replaceState(history.state, '', location.pathname + (v ? '?ciel=' + v : '') + location.hash); }catch(e){}
+}
+function inviteInstall(where){
+  if(STANDALONE || S.install || !(IOS || ANDROID) || where.querySelector('.install')) return;
+  const box = el('div', 'rappel install'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Garder le grimoire sur ton écran d\'accueil');
+  let etapes = [], bouton = '';
+  if(DANS_APPLI) etapes = ['Touche ⋯ en haut à droite.', 'Choisis « Ouvrir dans le navigateur » (ou « dans Safari »).', 'Reviens ici : la suite t\'attendra.'];
+  else if(IOS){ etapes = ['Touche le bouton Partager (le carré avec une flèche vers le haut).', 'Choisis « Sur l\'écran d\'accueil ».', 'Touche « Ajouter ».']; majURLCiel(); }
+  else if(promptInstall) bouton = '<button class="lbtn rouge inst-go" type="button">Ajouter à l\'écran d\'accueil</button>';
+  else etapes = ['Touche ⋮ en haut à droite.', 'Choisis « Ajouter à l\'écran d\'accueil » ou « Installer l\'application ».'];
+  box.innerHTML = '<p class="q">Veux-tu garder ton grimoire sur ton écran d\'accueil, comme une vraie appli ? Il s\'ouvrira même sans réseau.</p>'
+    + (etapes.length ? '<ol class="etapes">' + etapes.map(t => '<li>' + esc(t) + '</li>').join('') + '</ol>' : '') + bouton
+    + '<button class="rap-non" type="button">Non merci</button>';
+  const fini = v => { S.install = v; saveS(); document.querySelectorAll('.install').forEach(b => b.remove()); };
+  box.querySelector('.rap-non').onclick = () => fini('non');
+  const go = box.querySelector('.inst-go');
+  if(go) go.onclick = async () => {
+    const e = promptInstall; if(!e) return; promptInstall = null;
+    try{ e.prompt(); const r = await e.userChoice; if(r && r.outcome === 'accepted') fini('ok'); }catch(x){}
+  };
+  where.append(box);
+}
+
 /* Musique d'un soir : celle de la visite, quel que soit le soir (la colonne « musique » du Sheet n'est plus lue). */
 const low = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const slugJS = s => low(s).replace(/\.[a-z0-9]{2,4}$/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -626,7 +766,7 @@ bSon.addEventListener('click', () => {
    &date=2026-11-20        fait comme si on était ce jour-là
    &heure=20:59            fait comme s'il était cette heure-là (le verrou s'applique alors)
    &rencontre=2026-11-22   remplace DATE_RENCONTRE
-   &geste=1 à 7            force un geste
+   &geste=1 à 11           force un geste (8 fil d'Ariane, 9 lyre, 10 flèche d'Éros, 11 étoile filante)
    &csv=adresse            lit un autre fichier CSV
    ========================================================= */
 const T = { test: Q.get('test') === '1' };
@@ -663,7 +803,12 @@ if(!Array.isArray(S.lus)) S.lus = [];
 if(!Array.isArray(S.rows)) S.rows = [];
 function saveS(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 const isRead = d => S.lus.includes(d);
-function markRead(d){ if(!isRead(d)){ S.lus.push(d); saveS(); } }
+function markRead(d){ if(!isRead(d)){ S.lus.push(d); saveS(); majURLCiel(); } }
+/* Ouverture depuis l'icône de l'iPhone : on récupère les pages lues glissées dans l'adresse */
+if(!T.test){
+  const ciel = (Q.get('ciel') || '').split('.').filter(x => /^\d{6}$/.test(x)).map(x => '20' + x.slice(0, 2) + '-' + x.slice(2, 4) + '-' + x.slice(4));
+  if(ciel.length){ ciel.forEach(d => { if(!S.lus.includes(d)) S.lus.push(d); }); S.lus.sort(); S.intro = S.intro || 1; saveS(); }
+}
 /* Son activé par défaut, partout, sauf si elle l'a coupé elle-même (bouton en haut à droite).
    Le téléphone ne laisse jouer la musique qu'après un premier toucher : on la lance à ce moment-là. */
 Snd.on = !S.muet; majSon();
@@ -754,7 +899,7 @@ function build(rows, ok){
   const vis = list.filter(p => p.date < today || (p.date === today && un));
   if(ok){ S.rows = rows.filter(r => r.date < today || (r.date === today && un)); saveS(); }
   ST = {list:vis, ok, today, un, key:today + '|' + un};
-  $('#bSom').hidden = !vis.length;
+  $('#bSom').hidden = !vis.length; $('#bCiel').hidden = !vis.length;
   const jx = $('#jx');
   if(RENCONTRE){ const x = daysBetween(today, RENCONTRE); jx.hidden = x < 1; jx.textContent = 'J-' + x + ' avant la visite divine'; }
   else jx.hidden = true;
@@ -786,6 +931,7 @@ function route(){
   if(introOn) return;
   const h = location.hash;
   if(h === '#sommaire' && ST.list.length) return showSommaire();
+  if(h === '#ciel' && ST.list.length) return showCiel();
   const m = h.match(/^#page-(\d+)$/);
   if(m){ const p = ST.list.find(x => x.n === +m[1]); if(p) return showPage(p, {from:'som'}); }
   tonight();
@@ -793,6 +939,7 @@ function route(){
 window.addEventListener('hashchange', route);
 $('#bHome').addEventListener('click', () => { if(location.hash) location.hash = ''; else route(); });
 $('#bSom').addEventListener('click', () => { location.hash = 'sommaire'; });
+$('#bCiel').addEventListener('click', () => { location.hash = 'ciel'; });
 
 function tonight(){
   if(!ST.un) return showSleep();
@@ -867,7 +1014,7 @@ function showSleep(){
   d.innerHTML = CAT_SLEEP + '<h1 class="msg">Le grimoire dort encore. Reviens à la tombée de la nuit, princesse.</h1>'
     + '<p class="cd" role="timer" aria-live="off">Il s\'éveille dans <b aria-hidden="true"></b><span class="sr-only">quelques heures, à ' + HEURE_DEBLOCAGE + ' heures.</span></p>';
   if(ST.list.length){ const b = el('button', 'lbtn', 'Feuilleter les pages passées'); b.type = 'button'; b.onclick = () => { location.hash = 'sommaire'; }; d.append(b); }
-  inviteSon(d); inviteRappel(d);
+  inviteSon(d); inviteRappel(d); inviteInstall(d);
   view.append(d);
   const out = d.querySelector('.cd b');
   const tick = () => {
@@ -905,14 +1052,98 @@ function showSommaire(){
     li.append(b); ol.append(li);
   });
   d.append(ol);
+  const ciel = el('button', 'nouv-etoile', '✦ Ton ciel · ' + lues + (lues > 1 ? ' étoiles' : ' étoile')); ciel.type = 'button'; ciel.style.margin = '0 auto 14px';
+  ciel.onclick = () => { location.hash = 'ciel'; }; d.append(ciel);
   const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
   d.append(back);
   view.append(d);
   focusSoft(d.querySelector('h1'));
 }
 
+/* ---------- Ton ciel : chaque page lue allume une étoile ----------
+   Sept étoiles par constellation. Quand une constellation est complète, Dieu raconte son mythe. */
+const CIEL = [
+  { nom:'La Couronne boréale', qui:'la couronne d\'Ariane',
+    pts:[[16, 56], [26, 38], [40, 27], [55, 25], [68, 31], [78, 43], [84, 59]], traits:[[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]],
+    mythe:'Ariane avait sauvé Thésée avec un simple fil d\'or, pour qu\'il sorte du labyrinthe. Lui l\'a laissée endormie sur une plage de Naxos. Dionysos l\'y a trouvée. Pour qu\'elle n\'oublie jamais qu\'on pouvait la choisir, il a lancé sa couronne dans le ciel. Elle y brille encore. Sept soirs, sept étoiles : la voilà au-dessus de toi.' },
+  { nom:'La Lyre', qui:'la lyre d\'Orphée',
+    pts:[[46, 14], [60, 20], [66, 30], [42, 36], [58, 41], [36, 76], [56, 81]], traits:[[0, 1], [1, 2], [0, 3], [3, 4], [4, 0], [3, 5], [4, 6], [5, 6]],
+    mythe:'Orphée jouait si bien que les pierres le suivaient et que les fleuves s\'arrêtaient pour l\'écouter. Il est descendu jusqu\'aux Enfers chercher Eurydice, avec sa musique pour seule arme. Quand il est mort, les Muses ont posé sa lyre parmi les étoiles. Certaines musiques ne s\'arrêtent jamais vraiment.' },
+  { nom:'Les Pléiades', qui:'les sept sœurs',
+    pts:[[30, 42], [38, 30], [46, 20], [42, 52], [52, 48], [70, 54], [72, 42]], traits:[[0, 1], [1, 2], [0, 3], [3, 4], [4, 1], [4, 5], [5, 6]],
+    mythe:'Sept sœurs, les filles d\'Atlas, poursuivies par Orion à travers toute la Grèce. Zeus les a changées en colombes, puis en étoiles, pour qu\'elles trouvent enfin la paix. Elles restent serrées les unes contre les autres : on ne voit jamais l\'une sans les autres. En ce moment, elles se lèvent à l\'est à la tombée de la nuit. Cherche-les.' },
+  { nom:'Andromède', qui:'la princesse délivrée',
+    pts:[[14, 28], [30, 36], [46, 46], [70, 58], [44, 28], [42, 15], [28, 52]], traits:[[0, 1], [1, 2], [2, 3], [2, 4], [4, 5], [1, 6]],
+    mythe:'Andromède était enchaînée à un rocher, face à la mer, condamnée à attendre le monstre. Persée est arrivé à temps, porté par ses sandales ailées, et a brisé ses chaînes. Athéna l\'a placée dans le ciel, libre, les bras ouverts. Personne ne devrait attendre seul sur son rocher.' },
+  { nom:'Orion', qui:'le chasseur',
+    pts:[[30, 16], [66, 20], [44, 50], [50, 48], [56, 46], [36, 84], [70, 82]], traits:[[0, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6]],
+    mythe:'Orion, le chasseur géant, savait marcher sur la mer. Après sa mort, Zeus l\'a posé dans le ciel, si grand qu\'on le voit des deux côtés du monde. Sa ceinture, trois étoiles bien alignées, est la plus facile à trouver. Un soir d\'hiver, lève les yeux : tu sauras le reconnaître, maintenant.' }
+];
+const PAR_CONST = 7;
+function etoilesLues(){ return ST.list.filter(p => isRead(p.date)); }
+function constCourante(lit){
+  const c = lit > 0 && lit % PAR_CONST === 0 ? lit / PAR_CONST - 1 : Math.floor(lit / PAR_CONST);
+  return Math.min(c, CIEL.length - 1);
+}
+// Fond étoilé fixe (toujours le même dessin)
+const FOND_CIEL = (() => {
+  let x = 7, out = '';
+  const r = () => { x = (x * 16807) % 2147483647; return x / 2147483647; };
+  for(let i = 0; i < 90; i++) out += '<circle cx="' + (r() * 100).toFixed(1) + '" cy="' + (r() * 100).toFixed(1) + '" r="' + (.12 + r() * .28).toFixed(2) + '" opacity="' + (.15 + r() * .5).toFixed(2) + '"/>';
+  return out;
+})();
+function showCiel(sel){
+  screen(); music(nuitTrack(), 'nuit');
+  const lues = etoilesLues(), lit = lues.length, cur = constCourante(lit);
+  const ci = sel == null ? cur : sel, K = CIEL[ci], base = ci * PAR_CONST;
+  const vu = typeof S.cielVu === 'number' ? S.cielVu : 0;
+  const ici = Math.max(0, Math.min(PAR_CONST, lit - base));
+  const d = el('section', 'ciel');
+  d.innerHTML = '<h1 tabindex="-1">Ton ciel</h1><p class="sub">' + lit + (lit > 1 ? ' étoiles allumées' : ' étoile allumée') + ' · une par page lue</p>';
+  const v = el('div', 'voute');
+  v.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g class="fond">' + FOND_CIEL + '</g>'
+    + K.traits.map(([a, b]) => '<line class="trace' + (a < ici && b < ici ? ' on' : '') + '" x1="' + K.pts[a][0] + '" y1="' + K.pts[a][1] + '" x2="' + K.pts[b][0] + '" y2="' + K.pts[b][1] + '"/>').join('') + '</svg>';
+  K.pts.forEach((pt, i) => {
+    const b = el('button', 'etoile'); b.type = 'button'; b.style.left = pt[0] + '%'; b.style.top = pt[1] + '%';
+    const p = lues[base + i];
+    if(p){
+      b.classList.add('on'); if(base + i >= vu && !RM) b.classList.add('neuve');
+      b.setAttribute('aria-label', 'Étoile de la page ' + p.n + ', ' + fmtLong(p.date) + '. Ouvrir la page.');
+      b.onclick = () => { location.hash = 'page-' + p.n; };
+    } else { b.disabled = true; b.setAttribute('aria-label', 'Étoile encore éteinte'); }
+    v.append(b);
+  });
+  d.append(v);
+  const nom = el('p', 'const-nom'); nom.innerHTML = '<small>' + (ci === 0 ? '1re' : (ci + 1) + 'e') + ' constellation · ' + ici + '/' + PAR_CONST + '</small>' + esc(K.nom);
+  d.append(nom);
+  if(ici >= PAR_CONST){
+    const m = el('div', 'mythe'); m.innerHTML = '<p class="who">Dieu te raconte ' + esc(K.qui) + '</p><p>' + esc(K.mythe) + '</p><p class="sig">Dieu</p>';
+    d.append(m);
+    if(ci === CIEL.length - 1) d.append(el('p', 'attente', 'Ton ciel est complet. Toutes ces étoiles sont à toi.'));
+  } else {
+    const reste = PAR_CONST - ici;
+    d.append(el('p', 'attente', lit === 0 ? 'Chaque page que tu lis allume une étoile. Sept étoiles, et une histoire se dessine.'
+      : 'Encore ' + reste + (reste > 1 ? ' étoiles' : ' étoile') + ' et Dieu te racontera l\'histoire de ' + K.qui + '.'));
+  }
+  // Les constellations déjà commencées
+  const ch = el('div', 'consts'); ch.setAttribute('role', 'group'); ch.setAttribute('aria-label', 'Tes constellations');
+  CIEL.forEach((k, i) => {
+    if(i > cur) return;
+    const b = el('button', 'chip', k.nom); b.type = 'button'; b.setAttribute('aria-pressed', String(i === ci));
+    b.onclick = () => showCiel(i); ch.append(b);
+  });
+  if(cur > 0) d.append(ch);
+  const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
+  back.style.marginTop = cur > 0 ? '0' : '26px';
+  d.append(back);
+  view.append(d);
+  if(lit > vu){ S.cielVu = lit; saveS(); }
+  focusSoft(d.querySelector('h1'));
+}
+
 /* ---------- Une page ---------- */
-const GESTES = ['rose', 'sceau', 'moto', 'vitre', 'chat', 'bougie', 'plume'];
+/* Les 7 premiers gestes gardent leur place (pages I à VII) ; les gestes grecs arrivent à la page VIII. */
+const GESTES = ['rose', 'sceau', 'moto', 'vitre', 'chat', 'bougie', 'plume', 'fil', 'lyre', 'fleche', 'filante'];
 function citText(s){
   s = String(s).replace(/\s+\/\s+/g, '\n').trim();
   return /^[«"“]/.test(s) ? s : '« ' + s + ' »';
@@ -955,16 +1186,24 @@ function showPage(p, opt){
       c.onAlt = null; alt.hidden = true; hint.textContent = '';
       reading.hidden = false; reading.removeAttribute('aria-hidden'); reading.classList.remove('typing');
       if(RM) reading.classList.add('show'); else requestAnimationFrame(() => reading.classList.add('show'));
+      const neuf = !isRead(p.date);
       markRead(p.date); buzz(18); after.hidden = false;
       curMode = 'plein'; Music.swell();
-      later(() => { buildToi(p, art.querySelector('.toi')); inviteRappel(art); }, RM ? 0 : 1800);
+      later(() => {
+        if(neuf){
+          const lit = etoilesLues().length;
+          const b = el('button', 'nouv-etoile', lit % PAR_CONST === 0 ? '✦ Une constellation est née dans ton ciel' : '✦ Une étoile s\'est allumée dans ton ciel');
+          b.type = 'button'; b.onclick = () => { location.hash = 'ciel'; }; reading.after(b);
+        }
+        buildToi(p, art.querySelector('.toi')); inviteRappel(art); inviteInstall(art);
+      }, RM ? 0 : 1800);
       later(() => { reading.scrollIntoView({behavior:RM ? 'auto' : 'smooth', block:'start'}); focusSoft(reading); }, RM ? 0 : 380);
     }
   };
   alt.onclick = () => { if(c.onAlt) c.onAlt(); };
   view.append(art);
 
-  const g = p.kind === 'fin' ? 'fin' : (T.geste ? GESTES[(T.geste - 1) % 7] : GESTES[(p.n - 1) % 7]);
+  const g = p.kind === 'fin' ? 'fin' : (T.geste ? GESTES[(T.geste - 1) % GESTES.length] : GESTES[(p.n - 1) % GESTES.length]);
   const track = chooseTrack(p, g);
   // iPhone : si la musique n'a pas pu démarrer seule, le premier toucher la relance
   art.addEventListener('pointerdown', () => {
@@ -1287,6 +1526,182 @@ G.plume = { hint:'La plume écrit pour toi…', alt:'Tout afficher',
   }
 };
 
+/* 8. Le fil d'Ariane : suivre les lueurs, dans l'ordre, du doigt ou d'un toucher */
+G.fil = { hint:'Ariane t\'a laissé son fil d\'or. Suis les lueurs pour sortir du labyrinthe.', alt:'Sortir du labyrinthe',
+  mount(c){
+    const P = [[10, 84], [10, 18], [37, 18], [37, 62], [64, 62], [64, 22], [90, 22]], s = c.stage;
+    s.style.touchAction = 'none';
+    s.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'
+      + '<path class="mur" vector-effect="non-scaling-stroke" d="M2 6H98V12M98 32V96H2V6M24 30V96M50 6V50M24 74H78M78 34V96M78 34H98"/>'
+      + '<polyline class="fil" vector-effect="non-scaling-stroke" points=""/></svg>';
+    const line = s.querySelector('.fil');
+    let at = 0, fini = false;
+    const btns = P.map((pt, i) => {
+      const b = el('button', 'lueur' + (i === P.length - 1 ? ' porte' : '')); b.type = 'button';
+      b.style.left = pt[0] + '%'; b.style.top = pt[1] + '%';
+      b.setAttribute('aria-label', i === 0 ? 'Le début du fil' : i === P.length - 1 ? 'La sortie du labyrinthe' : 'Lueur ' + i);
+      b.addEventListener('click', e => { if(e.detail === 0) tap(i); });   // clavier
+      s.append(b); return b;
+    });
+    const draw = () => {
+      line.setAttribute('points', P.slice(0, at + 1).map(p => p.join(',')).join(' '));
+      btns.forEach((b, i) => { b.classList.toggle('ok', i <= at); b.classList.toggle('next', i === at + 1); b.disabled = i <= at; });
+    };
+    const done = () => { if(fini) return; fini = true; s.classList.add('out'); Snd.play('bloom'); buzz([20, 40, 60]);
+      c.say('Te voilà sortie du labyrinthe.'); c.later(() => c.reveal(), RM ? 0 : 1300); };
+    const step = () => {
+      if(fini) return; at++; draw(); Snd.play('chime', {n:at}); buzz(10);
+      if(at === P.length - 1) done();
+      else c.say(at === P.length - 2 ? 'La sortie est tout près…' : 'Continue, le fil te guide.');
+      if(document.activeElement && document.activeElement.classList.contains('lueur')) focusSoft(btns[at + 1]);
+    };
+    const tap = i => { if(fini) return; if(i === at + 1) step(); else if(i > at + 1){ nudge(btns[i]); c.say('Suis le fil dans l\'ordre : la lueur qui brille.'); } };
+    // Du doigt : passer sur la lueur suivante suffit
+    const near = e => {
+      if(fini) return; const r = s.getBoundingClientRect(), n = P[at + 1]; if(!n) return;
+      if(Math.hypot(e.clientX - r.left - n[0] / 100 * r.width, e.clientY - r.top - n[1] / 100 * r.height) < 30) step();
+    };
+    let down = false;
+    s.addEventListener('pointerdown', e => { down = true; near(e); });
+    s.addEventListener('pointermove', e => { if(down) near(e); });
+    ['pointerup', 'pointercancel'].forEach(ev => s.addEventListener(ev, () => { down = false; }));
+    draw();
+    c.onAlt = () => { if(fini) return; const go = () => { if(fini) return; step(); if(!fini) c.later(go, RM ? 0 : 160); }; go(); };
+  }
+};
+
+/* 9. La lyre d'Orphée : faire vibrer les cinq cordes */
+G.lyre = { hint:'La lyre d\'Orphée. Fais vibrer ses cinq cordes, une à une ou d\'un seul glissé.', alt:'Faire chanter la lyre',
+  mount(c){
+    const X = [61, 83, 105, 127, 149], F = [392, 440, 523, 587, 659];
+    const w = el('div', 'lyre');
+    w.innerHTML = '<svg viewBox="0 0 210 236" aria-hidden="true">'
+      + '<path class="bois" d="M52 204C22 172 18 112 40 72 52 48 42 28 28 20"/><path class="bois" d="M158 204C188 172 192 112 170 72 158 48 168 28 182 20"/>'
+      + '<path class="bois" d="M38 52H172" stroke-width="5"/><path class="bois" d="M50 204H160" stroke-width="10"/>'
+      + X.map((x, i) => '<line class="corde" data-i="' + i + '" x1="' + x + '" y1="52" x2="' + x + '" y2="200"/>').join('') + '</svg>';
+    c.stage.append(w);
+    const cordes = Array.from(w.querySelectorAll('.corde')), ok = X.map(() => false);
+    let n = 0, fini = false;
+    X.forEach((x, i) => {
+      const b = el('button', 'cbtn'); b.type = 'button'; b.style.left = x + 'px'; b.setAttribute('aria-label', 'Corde ' + (i + 1) + ' sur 5');
+      b.addEventListener('click', e => { if(e.detail === 0) pluck(i); }); w.append(b);
+    });
+    const pluck = i => {
+      const k = cordes[i]; k.classList.remove('vib'); void k.getBoundingClientRect(); k.classList.add('vib');
+      Snd.play('pluck', {f:F[i]}); buzz(6);
+      if(!RM){ const nv = el('span', 'note-v', '♪'); nv.style.left = (X[i] - 6) + 'px'; nv.style.top = '40px'; nv.style.setProperty('--nx', rnd(-20, 20).toFixed(0) + 'px'); w.append(nv); c.later(() => nv.remove(), 1700); }
+      if(fini || ok[i]) return;
+      ok[i] = true; k.classList.add('ok'); n++;
+      if(n < 5) c.say(n === 4 ? 'Plus qu\'une corde…' : 'Encore ' + (5 - n) + ' cordes.');
+      else { fini = true; c.say('Orphée joue pour toi…'); c.later(() => { Snd.play('bloom'); buzz([20, 30, 40]); }, 300); c.later(() => c.reveal(), RM ? 0 : 1500); }
+    };
+    // Glisser le doigt à travers les cordes
+    let last = null;
+    const xIn = e => e.clientX - w.getBoundingClientRect().left;
+    w.addEventListener('pointerdown', e => {
+      e.preventDefault(); last = xIn(e);
+      let best = -1, d = 14; X.forEach((x, i) => { const dd = Math.abs(x - last); if(dd < d){ d = dd; best = i; } });
+      if(best >= 0) pluck(best);
+      try{ w.setPointerCapture(e.pointerId); }catch(x){}
+    });
+    w.addEventListener('pointermove', e => {
+      if(last == null) return; const x = xIn(e), a = Math.min(last, x), b = Math.max(last, x);
+      X.forEach((sx, i) => { if(sx > a && sx <= b) pluck(i); }); last = x;
+    });
+    ['pointerup', 'pointercancel'].forEach(ev => w.addEventListener(ev, () => { last = null; }));
+    c.onAlt = () => X.forEach((x, i) => c.later(() => pluck(i), RM ? 0 : i * 130));
+  }
+};
+
+/* 10. La flèche d'Éros : tirer la corde, puis lâcher */
+G.fleche = { hint:'Éros te prête son arc. Tire la corde vers la gauche, puis lâche.', alt:'Décocher la flèche',
+  mount(c){
+    const s = c.stage, BX = 78, Y = 125;
+    s.innerHTML = '<svg viewBox="0 0 360 250" aria-hidden="true">'
+      + '<g class="coeur"><path d="M300 150c-26-18-40-32-40-48 0-12 9-21 20-21 9 0 16 5 20 13 4-8 11-13 20-13 11 0 20 9 20 21 0 16-14 30-40 48z" fill="#8b0016" stroke="#e8536a" stroke-width="1.5"/></g>'
+      + '<g class="eclat" stroke="#ffd6a0" stroke-width="2" stroke-linecap="round"><path d="M300 70v-16M340 90l12-10M260 90l-12-10M346 128h16M254 128h-16"/></g>'
+      + '<path class="arc" d="M' + BX + ' 40Q148 ' + Y + ' ' + BX + ' 210"/>'
+      + '<polyline class="corde-arc" points=""/>'
+      + '<g class="trait"><path d="M0 0H118" stroke="#e9e0cf" stroke-width="2.4"/><path d="M118 -7L134 0 118 7z" fill="#c9a96e"/>'
+      + '<path d="M2 0l-12-8M2 0l-12 8M10 0l-12-8M10 0l-12 8" stroke="#d0213f" stroke-width="2"/></g></svg>';
+    const svg = s.firstChild, corde = svg.querySelector('.corde-arc'), trait = svg.querySelector('.trait');
+    s.style.touchAction = 'none';
+    let pull = 0, x0 = null, fini = false;
+    const draw = () => {
+      const nx = BX - pull * 52;
+      corde.setAttribute('points', BX + ',40 ' + nx + ',' + Y + ' ' + BX + ',210');
+      trait.setAttribute('transform', 'translate(' + nx + ' ' + Y + ')');
+    };
+    const fire = () => {
+      if(fini) return; fini = true; Snd.play('whoosh'); buzz(16);
+      const from = BX - pull * 52, to = 262 - 134 + 20, t0 = performance.now(), D = RM ? 1 : 320;
+      corde.setAttribute('points', BX + ',40 ' + BX + ',' + Y + ' ' + BX + ',210');
+      const fly = now => {
+        const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+        trait.setAttribute('transform', 'translate(' + (from + (to - from) * e) + ' ' + Y + ')');
+        if(k < 1) requestAnimationFrame(fly);
+        else { s.classList.add('touche'); Snd.play('chime', {n:5}); Snd.play('bloom'); buzz([30, 40, 80]); c.say('En plein cœur.'); c.later(() => c.reveal(), RM ? 0 : 1300); }
+      };
+      requestAnimationFrame(fly);
+    };
+    const k = () => { const r = s.getBoundingClientRect(); return Math.min(r.width / 360, r.height / 250); };
+    s.addEventListener('pointerdown', e => { if(fini) return; e.preventDefault(); x0 = e.clientX; try{ s.setPointerCapture(e.pointerId); }catch(x){} });
+    s.addEventListener('pointermove', e => {
+      if(x0 == null || fini) return;
+      const p = clamp((x0 - e.clientX) / k() / 52, 0, 1);
+      if(p > .6 && pull <= .6) buzz(8);
+      pull = p; draw();
+      c.say(p > .6 ? 'Lâche !' : 'Tire encore…');
+    });
+    const up = () => {
+      if(x0 == null || fini) return; x0 = null;
+      if(pull > .6){ Snd.play('pluck', {f:196}); fire(); }
+      else { pull = 0; draw(); if(!fini) c.say('Tire la corde un peu plus loin vers la gauche, puis lâche.'); }
+    };
+    s.addEventListener('pointerup', up); s.addEventListener('pointercancel', up);
+    draw();
+    c.onAlt = () => { pull = 1; draw(); c.later(fire, RM ? 0 : 250); };
+  }
+};
+
+/* 11. L'étoile filante : l'attraper au vol */
+G.filante = { hint:'Guette le ciel. Quand une étoile filante passe, attrape-la du doigt.', alt:'Faire un vœu',
+  mount(c){
+    const s = c.stage;
+    for(let i = 0; i < 46; i++){
+      const d = el('span', 'ciel-pt'); d.style.left = rnd(2, 98).toFixed(1) + '%'; d.style.top = rnd(2, 96).toFixed(1) + '%';
+      d.style.setProperty('--o', rnd(.35, .95).toFixed(2)); d.style.setProperty('--t', rnd(1.4, 4).toFixed(1) + 's'); s.append(d);
+    }
+    const b = el('button', 'filante'); b.type = 'button'; b.setAttribute('aria-label', 'Attraper l\'étoile filante'); b.hidden = true; s.append(b);
+    let anim = null, fini = false, passes = 0;
+    const lance = () => {
+      if(fini) return;
+      const W = s.clientWidth, H = s.clientHeight, y0 = rnd(8, 38), y1 = y0 + rnd(22, 40), D = 2600 + Math.min(passes, 3) * 700;
+      b.style.setProperty('--ang', (Math.atan2((y1 - y0) / 100 * H, 1.16 * W) * 180 / Math.PI).toFixed(1) + 'deg');
+      b.hidden = false; if(anim) anim.cancel();
+      if(b.animate) anim =b.animate([{left:'-8%', top:y0 + '%'}, {left:'108%', top:y1 + '%'}], {duration:D, easing:'linear', fill:'forwards'});
+      passes++;
+      if(passes === 3) c.say('Elle revient, plus lentement. Touche-la quand elle passe.');
+      c.later(() => { if(!fini){ b.hidden = true; c.later(lance, 900); } }, D);
+    };
+    const attrape = () => {
+      if(fini) return; fini = true; if(anim) anim.pause();
+      s.classList.add('voeu'); Snd.play('twinkle'); buzz([20, 30, 20]); c.say('Fais un vœu… Il reste entre toi et les étoiles.');
+      c.later(() => c.reveal(), RM ? 0 : 1900);
+    };
+    b.addEventListener('pointerdown', e => { e.preventDefault(); attrape(); });
+    b.addEventListener('click', attrape);
+    // Un toucher tout près de l'étoile compte aussi
+    s.addEventListener('pointerdown', e => {
+      if(fini || b.hidden) return; const r = b.getBoundingClientRect();
+      if(Math.hypot(e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2) < 80) attrape();
+    });
+    c.onAlt = attrape;
+    if(RM || !b.animate){ b.style.left = '50%'; b.style.top = '40%'; b.hidden = false; c.say('Une étoile filante s\'est arrêtée pour toi. Touche-la.'); return; }
+    c.later(lance, 900);
+  }
+};
+
 G.fin = { hint:'Regarde…', alt:'Tout afficher',
   mount(c){
     c.stage.classList.add('tall'); c.stage.innerHTML = BIGROSE;
@@ -1316,6 +1731,10 @@ if(!RM){
     const i2 = el('i'); i2.style.cssText = '--s:' + s.toFixed(1) + 'px;--sw:' + rnd(3, 6).toFixed(1) + 's;--o:' + rnd(.25, .5).toFixed(2) + ';';
     p.append(i2); pb.append(p);
   }
+}
+// Hors ligne : la page, les polices et les icônes restent dans le téléphone (sw.js)
+if('serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))){
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 }
 // Minuit ou 21 h passés pendant que la page est ouverte : on recharge le grimoire
 setInterval(() => { if(!document.hidden && ST.key && ST.key !== iso(clock()) + '|' + unlocked()) boot(); }, 15000);
