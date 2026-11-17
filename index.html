@@ -15,6 +15,18 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Grimoire">
+<!-- Écran de démarrage de l'appli sur iPhone (une image par taille d'écran) -->
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1179x2556.png">
+<link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1206x2622.png">
+<link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1320x2868.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1170x2532.png">
+<link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1284x2778.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1125x2436.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="demarrage/demarrage-828x1792.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1242x2688.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="demarrage/demarrage-750x1334.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="demarrage/demarrage-1242x2208.png">
 <script>
 /* iPhone : sans manifeste, l'icône s'ouvre sur l'adresse en cours (celle qui porte ses étoiles) */
 if(/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)){
@@ -679,8 +691,9 @@ function lienAndroid(){
     + '&recur=' + encodeURIComponent('RRULE:FREQ=DAILY')
     + '&details=' + encodeURIComponent('Une nouvelle page t\'attend.\n' + URL_GRIMOIRE);
 }
+const RAPPEL_FAIT = true;   // elle a déjà ajouté le rappel à son agenda : on ne le propose plus
 function inviteRappel(where){
-  if(S.rappel) return;
+  if(RAPPEL_FAIT || S.rappel) return;
   const box = el('div', 'rappel'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Rappel du soir');
   box.innerHTML = '<p class="q">Veux-tu que ton téléphone te prévienne chaque soir à ' + HEURE_DEBLOCAGE + ' h, quand une page s\'éveille ?</p>'
     + '<div class="rap-b"><a class="lbtn" href="rappel.ics">Sur iPhone</a>'
@@ -707,7 +720,8 @@ const DANS_APPLI = /Instagram|FBAN|FBAV|Line\/|Snapchat|TikTok/i.test(navigator.
 const ANDROID = /Android/i.test(navigator.userAgent);
 let promptInstall = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); promptInstall = e; });
-window.addEventListener('appinstalled', () => { S.install = 'ok'; saveS(); document.querySelectorAll('.install').forEach(b => b.remove()); });
+const installFaite = () => { if(S.install !== 'ok'){ S.install = 'ok'; saveS(); } document.querySelectorAll('.install').forEach(b => b.remove()); };
+window.addEventListener('appinstalled', installFaite);
 function majURLCiel(){
   if(!IOS || STANDALONE || T.test || !history.replaceState) return;
   const v = S.lus.filter(d => /^\d{4}-\d\d-\d\d$/.test(d)).map(d => d.slice(2).replace(/-/g, '')).join('.');
@@ -723,9 +737,11 @@ function inviteInstall(where){
   else etapes = ['Touche ⋮ en haut à droite.', 'Choisis « Ajouter à l\'écran d\'accueil » ou « Installer l\'application ».'];
   box.innerHTML = '<p class="q">Veux-tu garder ton grimoire sur ton écran d\'accueil, comme une vraie appli ? Il s\'ouvrira même sans réseau.</p>'
     + (etapes.length ? '<ol class="etapes">' + etapes.map(t => '<li>' + esc(t) + '</li>').join('') + '</ol>' : '') + bouton
+    + (etapes.length && !DANS_APPLI ? '<button class="lbtn inst-fait" type="button" style="margin-top:4px">C\'est fait, il est sur mon écran</button>' : '')
     + '<button class="rap-non" type="button">Non merci</button>';
   const fini = v => { S.install = v; saveS(); document.querySelectorAll('.install').forEach(b => b.remove()); };
   box.querySelector('.rap-non').onclick = () => fini('non');
+  const fait = box.querySelector('.inst-fait'); if(fait) fait.onclick = () => { installFaite(); announce('Parfait. Ouvre-le depuis ton écran d\'accueil.'); };
   const go = box.querySelector('.inst-go');
   if(go) go.onclick = async () => {
     const e = promptInstall; if(!e) return; promptInstall = null;
@@ -804,6 +820,11 @@ if(!Array.isArray(S.rows)) S.rows = [];
 function saveS(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 const isRead = d => S.lus.includes(d);
 function markRead(d){ if(!isRead(d)){ S.lus.push(d); saveS(); majURLCiel(); } }
+/* Ses deux premières pages (15 et 16/11), lues avant l'arrivée du ciel : leurs étoiles lui sont offertes */
+const ETOILES_OFFERTES = ["2026-11-15", "2026-11-16"];
+if(!T.test && ETOILES_OFFERTES.some(d => !S.lus.includes(d))){
+  ETOILES_OFFERTES.forEach(d => { if(!S.lus.includes(d)) S.lus.push(d); }); S.lus.sort(); saveS();
+}
 /* Ouverture depuis l'icône de l'iPhone : on récupère les pages lues glissées dans l'adresse */
 if(!T.test){
   const ciel = (Q.get('ciel') || '').split('.').filter(x => /^\d{6}$/.test(x)).map(x => '20' + x.slice(0, 2) + '-' + x.slice(2, 4) + '-' + x.slice(4));
@@ -941,9 +962,47 @@ $('#bHome').addEventListener('click', () => { if(location.hash) location.hash = 
 $('#bSom').addEventListener('click', () => { location.hash = 'sommaire'; });
 $('#bCiel').addEventListener('click', () => { location.hash = 'ciel'; });
 
+/* ---------- La vidéo des nouveautés : ce soir-là seulement (à partir de 21 h, jusqu'à minuit) ----------
+   Proposée une fois avant la page du soir, puis un bouton « Revoir les nouveautés » sous la page. */
+const NOUVEAUTES = { date:'2026-11-17', video:'nouveautes.mp4' };
+const nouveautesCeSoir = () => ST.today === NOUVEAUTES.date && ST.un;
+function showNouveautes(suite){
+  introOn = true; music(null); screen();
+  const d = el('section', 'screen');
+  d.innerHTML = '<svg class="art" viewBox="-40 -40 80 80" aria-hidden="true" style="width:90px"><path d="M0 -36L7 -7 36 0 7 7 0 36 -7 7 -36 0 -7 -7Z" fill="#fff3d6" style="filter:drop-shadow(0 0 8px rgba(255,200,120,.9))"/></svg>'
+    + '<h1 class="msg">Ton grimoire a grandi, princesse.</h1>'
+    + '<p class="sur">Ce soir seulement : 47 secondes pour découvrir ses nouveautés, avec le son.</p>';
+  let fini = false;
+  const done = () => {
+    if(fini) return; fini = true; introOn = false; S.nouv = 1; saveS();
+    const w = document.querySelector('.intro-v.nouv'); if(w){ try{ w.querySelector('video').pause(); }catch(e){} w.remove(); }
+    suite();
+  };
+  const go = el('button', 'lbtn rouge', '▶ Regarder'); go.type = 'button'; go.style.marginTop = '22px';
+  const skip = el('button', 'rap-non', 'Plus tard, ouvrir ma page'); skip.type = 'button';
+  go.onclick = () => {
+    const w = el('div', 'intro-v nouv');
+    w.innerHTML = '<video playsinline preload="auto" src="' + NOUVEAUTES.video + '" aria-describedby="nouv-txt"></video>'
+      + '<button class="intro-skip" type="button">Passer</button>'
+      + '<p id="nouv-txt" class="sr-only">Ton grimoire a grandi. Quatre gestes venus de Grèce, dès la page huit : le fil d’Ariane, la lyre d’Orphée, la flèche d’Éros et l’étoile filante. Ton ciel : une étoile par page lue. Tes deux premières pages t’ont déjà offert deux étoiles de la Couronne boréale, la troisième s’allume ce soir. Sept étoiles, une constellation, et Dieu te raconte son mythe. Touche l’étoile en haut de ton grimoire. Garde-le sur ton écran d’accueil : il s’ouvre comme une vraie appli, même sans réseau. Maintenant, ta page t’attend. Dieu.</p>';
+    document.body.append(w);
+    const v = w.querySelector('video');
+    v.muted = !Snd.on;
+    v.onended = done; v.onerror = done;
+    w.querySelector('.intro-skip').onclick = done;
+    const pr = v.play(); if(pr) pr.catch(() => { v.muted = true; v.play().catch(done); });
+    focusSoft(w.querySelector('.intro-skip'));
+  };
+  skip.onclick = done;
+  d.append(go, skip);
+  view.append(d);
+  focusSoft(d.querySelector('h1'));
+}
+
 function tonight(){
   if(!ST.un) return showSleep();
   const p = ST.list.find(x => x.date === ST.today);
+  if(p && nouveautesCeSoir() && !S.nouv) return showNouveautes(() => showPage(p, {replay:true}));
   // La page du soir rejoue toujours le geste, même déjà lue (consigne : tout le parcours à chaque arrivée)
   if(p) return showPage(p, {replay:true});
   if(!ST.ok && ST.list.length){
@@ -1177,6 +1236,7 @@ function showPage(p, opt){
   if(prev) nb('‹ ' + roman(prev.n), 'Page précédente, ' + prev.n, () => { location.hash = 'page-' + prev.n; });
   nb('Feuilleter le grimoire', null, () => { location.hash = 'sommaire'; });
   if(next) nb(roman(next.n) + ' ›', 'Page suivante, ' + next.n, () => { location.hash = 'page-' + next.n; });
+  if(p.date === ST.today && nouveautesCeSoir()) nb('▶ Revoir les nouveautés', null, () => showNouveautes(() => showPage(p, opt)));
 
   let revealed = false;
   const c = {page:p, stage, reading, hint, alt, full, later, onAlt:null,
@@ -1731,6 +1791,12 @@ if(!RM){
     const i2 = el('i'); i2.style.cssText = '--s:' + s.toFixed(1) + 'px;--sw:' + rnd(3, 6).toFixed(1) + 's;--o:' + rnd(.25, .5).toFixed(2) + ';';
     p.append(i2); pb.append(p);
   }
+}
+// Ouvert depuis l'icône : c'est installé, on ne le propose plus (Android partage cette mémoire avec Chrome)
+if(STANDALONE) installFaite();
+// Android : Chrome sait dire si l'appli est déjà sur l'écran d'accueil
+if(!STANDALONE && navigator.getInstalledRelatedApps){
+  navigator.getInstalledRelatedApps().then(l => { if(l && l.length) installFaite(); }).catch(() => {});
 }
 // Hors ligne : la page, les polices et les icônes restent dans le téléphone (sw.js)
 if('serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))){
