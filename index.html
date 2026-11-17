@@ -76,6 +76,13 @@ const MUSIQUES = [
     "envol": 99.5
   },
   {
+    "fichier": "neoni-darkside.mp3",
+    "titre": "NEONI - Darkside",
+    "ambiance": "intense",
+    "calme": 40.0,
+    "envol": 52.5
+  },
+  {
     "fichier": "ruelle-the-other-side.mp3",
     "titre": "Ruelle - The Other Side",
     "ambiance": "douce",
@@ -652,9 +659,16 @@ const PISTE_KEY = () => T.test ? 'grimoire.test.piste' : 'grimoire.piste';
 function nouvellePiste(){
   if(!MUSIQUES.length) return null;
   const forcee = T.musique && MUSIQUES.find(m => m.fichier.includes(slugJS(T.musique)));
-  const autres = MUSIQUES.filter(m => m.fichier !== S.piste), L = autres.length ? autres : MUSIQUES;
+  // Un tour complet : chaque chanson passe une fois avant qu'une autre revienne,
+  // et jamais deux fois de suite (même d'un tour à l'autre).
+  const connues = f => MUSIQUES.some(m => m.fichier === f);
+  let cycle = Array.isArray(S.cycle) ? S.cycle.filter(connues) : [];
+  let L = MUSIQUES.filter(m => !cycle.includes(m.fichier) && m.fichier !== S.piste);
+  if(!L.length){ cycle = []; L = MUSIQUES.filter(m => m.fichier !== S.piste); }
+  if(!L.length) L = MUSIQUES;
   piste = forcee || L[Math.floor(Math.random() * L.length)];
-  S.piste = piste.fichier; saveS();
+  cycle.push(piste.fichier);
+  S.cycle = cycle; S.piste = piste.fichier; saveS();
   try{ sessionStorage.setItem(PISTE_KEY(), piste.fichier); }catch(e){}
   return piste;
 }
