@@ -962,16 +962,16 @@ $('#bHome').addEventListener('click', () => { if(location.hash) location.hash = 
 $('#bSom').addEventListener('click', () => { location.hash = 'sommaire'; });
 $('#bCiel').addEventListener('click', () => { location.hash = 'ciel'; });
 
-/* ---------- La vidéo des nouveautés : ce soir-là seulement (à partir de 21 h, jusqu'à minuit) ----------
-   Proposée une fois avant la page du soir, puis un bouton « Revoir les nouveautés » sous la page. */
+/* ---------- La vidéo des nouveautés ----------
+   Proposée une fois, à sa première arrivée (à toute heure), avant le reste.
+   Ensuite, elle peut la revoir quand elle veut : Sommaire, Ton ciel, grimoire endormi. */
 const NOUVEAUTES = { date:'2026-11-17', video:'nouveautes.mp4' };
-const nouveautesCeSoir = () => ST.today === NOUVEAUTES.date && ST.un;
-function showNouveautes(suite){
+function showNouveautes(suite, direct){
   introOn = true; music(null); screen();
   const d = el('section', 'screen');
   d.innerHTML = '<svg class="art" viewBox="-40 -40 80 80" aria-hidden="true" style="width:90px"><path d="M0 -36L7 -7 36 0 7 7 0 36 -7 7 -36 0 -7 -7Z" fill="#fff3d6" style="filter:drop-shadow(0 0 8px rgba(255,200,120,.9))"/></svg>'
     + '<h1 class="msg">Ton grimoire a grandi, princesse.</h1>'
-    + '<p class="sur">Ce soir seulement : 47 secondes pour découvrir ses nouveautés, avec le son.</p>';
+    + '<p class="sur">47 secondes pour découvrir ses nouveautés, avec le son. Tu pourras la revoir quand tu veux, depuis le Sommaire.</p>';
   let fini = false;
   const done = () => {
     if(fini) return; fini = true; introOn = false; S.nouv = 1; saveS();
@@ -996,13 +996,18 @@ function showNouveautes(suite){
   skip.onclick = done;
   d.append(go, skip);
   view.append(d);
-  focusSoft(d.querySelector('h1'));
+  if(direct) go.onclick(); else focusSoft(d.querySelector('h1'));
+}
+function boutonNouveautes(where){
+  const b = el('button', 'lbtn', '▶ Revoir les nouveautés du grimoire'); b.type = 'button'; b.style.marginTop = '14px';
+  b.onclick = () => { reveilSon(); showNouveautes(route, true); };
+  where.append(b);
 }
 
 function tonight(){
+  if(!S.nouv && ST.today >= NOUVEAUTES.date) return showNouveautes(tonight);
   if(!ST.un) return showSleep();
   const p = ST.list.find(x => x.date === ST.today);
-  if(p && nouveautesCeSoir() && !S.nouv) return showNouveautes(() => showPage(p, {replay:true}));
   // La page du soir rejoue toujours le geste, même déjà lue (consigne : tout le parcours à chaque arrivée)
   if(p) return showPage(p, {replay:true});
   if(!ST.ok && ST.list.length){
@@ -1073,7 +1078,7 @@ function showSleep(){
   d.innerHTML = CAT_SLEEP + '<h1 class="msg">Le grimoire dort encore. Reviens à la tombée de la nuit, princesse.</h1>'
     + '<p class="cd" role="timer" aria-live="off">Il s\'éveille dans <b aria-hidden="true"></b><span class="sr-only">quelques heures, à ' + HEURE_DEBLOCAGE + ' heures.</span></p>';
   if(ST.list.length){ const b = el('button', 'lbtn', 'Feuilleter les pages passées'); b.type = 'button'; b.onclick = () => { location.hash = 'sommaire'; }; d.append(b); }
-  inviteSon(d); inviteRappel(d); inviteInstall(d);
+  inviteSon(d); inviteRappel(d); inviteInstall(d); if(S.nouv) boutonNouveautes(d);
   view.append(d);
   const out = d.querySelector('.cd b');
   const tick = () => {
@@ -1114,7 +1119,7 @@ function showSommaire(){
   const ciel = el('button', 'nouv-etoile', '✦ Ton ciel · ' + lues + (lues > 1 ? ' étoiles' : ' étoile')); ciel.type = 'button'; ciel.style.margin = '0 auto 14px';
   ciel.onclick = () => { location.hash = 'ciel'; }; d.append(ciel);
   const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
-  d.append(back);
+  d.append(back); boutonNouveautes(d);
   view.append(d);
   focusSoft(d.querySelector('h1'));
 }
@@ -1194,7 +1199,7 @@ function showCiel(sel){
   if(cur > 0) d.append(ch);
   const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
   back.style.marginTop = cur > 0 ? '0' : '26px';
-  d.append(back);
+  d.append(back); boutonNouveautes(d);
   view.append(d);
   if(lit > vu){ S.cielVu = lit; saveS(); }
   focusSoft(d.querySelector('h1'));
@@ -1236,7 +1241,6 @@ function showPage(p, opt){
   if(prev) nb('‹ ' + roman(prev.n), 'Page précédente, ' + prev.n, () => { location.hash = 'page-' + prev.n; });
   nb('Feuilleter le grimoire', null, () => { location.hash = 'sommaire'; });
   if(next) nb(roman(next.n) + ' ›', 'Page suivante, ' + next.n, () => { location.hash = 'page-' + next.n; });
-  if(p.date === ST.today && nouveautesCeSoir()) nb('▶ Revoir les nouveautés', null, () => showNouveautes(() => showPage(p, opt)));
 
   let revealed = false;
   const c = {page:p, stage, reading, hint, alt, full, later, onAlt:null,
