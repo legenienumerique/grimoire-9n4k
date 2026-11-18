@@ -420,6 +420,15 @@ button{font:inherit;color:inherit}
 .consts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:20px 0 26px}
 .consts .chip[aria-pressed="true"]{border-color:var(--gold);background:rgba(201,169,110,.18);color:var(--ink)}
 .consts .chip:disabled{opacity:.35;cursor:default}
+.etoile-vol{position:fixed;inset:0;z-index:50;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(5,5,10,.72),rgba(5,5,10,.4) 75%);transition:background .6s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 24px;text-align:center}
+.etoile-vol .astre{width:120px;height:120px;position:relative}
+.etoile-vol .astre svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 18px rgba(255,205,120,.95)) drop-shadow(0 0 48px rgba(255,190,100,.6))}
+.etoile-vol .onde{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:2px solid rgba(255,214,140,.8)}
+.etoile-vol .mots{background:rgba(14,11,18,.97);border:1px solid rgba(201,169,110,.45);border-radius:18px;padding:14px 22px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.etoile-vol .mots b{display:block;font-family:inherit;font-style:italic;font-weight:500;font-size:22px;color:#f6e7c4}
+.etoile-vol .mots small{display:block;margin-top:6px;font-size:13px;letter-spacing:.08em;color:#d9b56a}
+#bCiel.brille{animation:ciel-brille 1.1s ease-in-out 3}
+@keyframes ciel-brille{0%,100%{filter:none;transform:none}50%{filter:drop-shadow(0 0 10px rgba(255,205,120,1));transform:scale(1.25)}}
 .nouv-etoile{display:block;margin:26px auto 0;min-height:48px;padding:0 20px;border-radius:999px;border:1px solid rgba(201,169,110,.5);background:rgba(201,169,110,.1);
   color:var(--gold);font-family:var(--sans);font-size:.88rem;cursor:pointer}
 
@@ -1206,6 +1215,32 @@ function voirMythe(ci){
   const pr = v.play(); if(pr) pr.catch(() => { v.muted = true; v.play().catch(done); });
   focusSoft(w.querySelector('.intro-skip'));
 }
+// Une page lue pour la première fois : une étoile naît au milieu de l'écran, puis s'envole vers le bouton ✦ du ciel
+function etoileDebloquee(lit){
+  if(!lit) return;
+  const ci = constCourante(lit), K = CIEL[ci], ici = lit - ci * PAR_CONST, complete = ici >= PAR_CONST;
+  const o = el('div', 'etoile-vol'); o.setAttribute('role', 'status');
+  o.innerHTML = '<div class="astre"><span class="onde"></span><svg viewBox="-20 -20 40 40" aria-hidden="true"><path d="M0 -20L4 -4 20 0 4 4 0 20 -4 4 -20 0 -4 -4Z" fill="#fff3d6"/></svg></div>'
+    + '<div class="mots"><b>' + (complete ? 'Ta constellation est complète !' : 'Une étoile s’est allumée dans ton ciel') + '</b>'
+    + '<small>' + esc(K.nom) + ' · ' + Math.min(ici, PAR_CONST) + '/' + PAR_CONST + '</small></div>';
+  document.body.append(o);
+  Snd.play('twinkle'); buzz([16, 30, 16]);
+  const astre = o.querySelector('.astre'), mots = o.querySelector('.mots'), onde = o.querySelector('.onde'), cible = $('#bCiel');
+  let fini = false;
+  const fin = () => { if(fini) return; fini = true; o.remove(); if(cible && !cible.hidden){ cible.classList.remove('brille'); void cible.offsetWidth; cible.classList.add('brille'); } };
+  if(RM || !astre.animate){ setTimeout(fin, 2600); return; }
+  astre.animate([{transform:'scale(0) rotate(-120deg)', opacity:0}, {transform:'scale(1.25) rotate(10deg)', opacity:1, offset:.6}, {transform:'scale(1) rotate(0)', opacity:1}], {duration:900, easing:'cubic-bezier(.2,.8,.2,1)', fill:'both'});
+  onde.animate([{transform:'scale(.4)', opacity:.9}, {transform:'scale(6)', opacity:0}], {duration:1300, delay:250, easing:'ease-out', fill:'both'});
+  mots.animate([{transform:'translateY(14px)', opacity:0, filter:'blur(6px)'}, {transform:'none', opacity:1, filter:'none'}], {duration:700, delay:450, easing:'ease-out', fill:'both'});
+  setTimeout(() => {
+    mots.animate([{opacity:1}, {opacity:0}], {duration:400, fill:'both'});
+    o.style.background = 'transparent';
+    let dx = 0, dy = -window.innerHeight / 2;
+    if(cible && !cible.hidden){ const r = cible.getBoundingClientRect(), a = astre.getBoundingClientRect(); dx = r.left + r.width / 2 - (a.left + a.width / 2); dy = r.top + r.height / 2 - (a.top + a.height / 2); }
+    const vol = astre.animate([{transform:'translate(0,0) scale(1)', opacity:1}, {transform:'translate(' + dx * .5 + 'px,' + (dy * .5 - 40) + 'px) scale(.6) rotate(180deg)', opacity:1, offset:.55}, {transform:'translate(' + dx + 'px,' + dy + 'px) scale(.18) rotate(360deg)', opacity:.9}], {duration:1100, easing:'cubic-bezier(.5,0,.3,1)', fill:'both'});
+    vol.onfinish = fin; setTimeout(fin, 1400);   // filet si l'animation est suspendue
+  }, 2600);
+}
 function showCiel(sel){
   screen(); music(nuitTrack(), 'nuit');
   const lues = etoilesLues(), lit = lues.length, cur = constCourante(lit);
@@ -1314,6 +1349,7 @@ function showPage(p, opt){
           const lit = etoilesLues().length;
           const b = el('button', 'nouv-etoile', lit % PAR_CONST === 0 ? '✦ Une constellation est née dans ton ciel' : '✦ Une étoile s\'est allumée dans ton ciel');
           b.type = 'button'; b.onclick = () => { location.hash = 'ciel'; }; reading.after(b);
+          etoileDebloquee(lit);
         }
         buildToi(p, art.querySelector('.toi')); inviteRappel(art); inviteInstall(art);
       }, RM ? 0 : 1800);
