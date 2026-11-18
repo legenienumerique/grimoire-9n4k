@@ -1867,11 +1867,11 @@ function showIntro(){
   const skip = el('button', 'rap-non', 'Passer l\'introduction'); skip.type = 'button';
   go.onclick = () => {
     reveilSon();   // la musique suivra dans le grimoire (sauf si elle a coupé le son)
-    const src = 'intro-' + (pisteDuSoir() || MUSIQUES[0]).fichier.replace(/\.mp3$/, '') + '.mp4';
+    const src = 'intro-' + (pisteDuSoir() || MUSIQUES[0]).fichier.replace(/\.mp3$/, '') + '.mp4?v=2';
     const w = el('div', 'intro-v');
     w.innerHTML = '<video playsinline preload="auto" src="' + src + '" aria-describedby="intro-txt"></video>'
       + '<button class="intro-skip" type="button">Passer</button>'
-      + '<p id="intro-txt" class="sr-only">Une bougie s’allume près d’une lettre scellée de cire rouge, frappée d’une rose. La cire fond, l’enveloppe s’ouvre. Sur la lettre, à l’encre : Bienvenue, princesse. Ce grimoire est à toi. Chaque soir, à 21 h, une page s’éveille. Un geste, une citation, un mot de moi. Un moment rien qu’à toi. Aujourd’hui, quelqu’un a pensé à toi. Demain aussi. Une rose se dessine, signé Dieu.</p>';
+      + '<p id="intro-txt" class="sr-only">L’œil d’une chouette s’ouvre, la pleine lune dans la pupille. La nuit, quelqu’un veille. Ses serres tiennent une page scellée de cire rouge : il t’a écrit une page. La chouette passe devant la lune, au-dessus d’un temple grec, puis traverse une ville endormie pour toi. Elle se pose à une fenêtre éclairée et y dépose la page. Ta page t’attend. Signé Dieu.</p>';
     document.body.append(w);
     const v = w.querySelector('video');
     v.muted = !Snd.on;   // si elle a coupé le son, la vidéo reste muette aussi
