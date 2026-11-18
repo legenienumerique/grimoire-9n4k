@@ -1143,7 +1143,8 @@ function showSommaire(){
 const CIEL = [
   { nom:'La Couronne boréale', qui:'la couronne d\'Ariane',
     pts:[[16, 56], [26, 38], [40, 27], [55, 25], [68, 31], [78, 43], [84, 59]], traits:[[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]],
-    mythe:'Ariane avait sauvé Thésée avec un simple fil d\'or, pour qu\'il sorte du labyrinthe. Lui l\'a laissée endormie sur une plage de Naxos. Dionysos l\'y a trouvée. Pour qu\'elle n\'oublie jamais qu\'on pouvait la choisir, il a lancé sa couronne dans le ciel. Elle y brille encore. Sept soirs, sept étoiles : la voilà au-dessus de toi.' },
+    mythe:'Ariane avait sauvé Thésée avec un simple fil d\'or, pour qu\'il sorte du labyrinthe. Lui l\'a laissée endormie sur une plage de Naxos. Dionysos l\'y a trouvée. Pour qu\'elle n\'oublie jamais qu\'on pouvait la choisir, il a lancé sa couronne dans le ciel. Elle y brille encore. Sept soirs, sept étoiles : la voilà au-dessus de toi.',
+    video:'mythe-couronne.mp4', duree:'1 min 12' },
   { nom:'La Lyre', qui:'la lyre d\'Orphée',
     pts:[[46, 14], [60, 20], [66, 30], [42, 36], [58, 41], [36, 76], [56, 81]], traits:[[0, 1], [1, 2], [0, 3], [3, 4], [4, 0], [3, 5], [4, 6], [5, 6]],
     mythe:'Orphée jouait si bien que les pierres le suivaient et que les fleuves s\'arrêtaient pour l\'écouter. Il est descendu jusqu\'aux Enfers chercher Eurydice, avec sa musique pour seule arme. Quand il est mort, les Muses ont posé sa lyre parmi les étoiles. Certaines musiques ne s\'arrêtent jamais vraiment.' },
@@ -1170,6 +1171,26 @@ const FOND_CIEL = (() => {
   for(let i = 0; i < 90; i++) out += '<circle cx="' + (r() * 100).toFixed(1) + '" cy="' + (r() * 100).toFixed(1) + '" r="' + (.12 + r() * .28).toFixed(2) + '" opacity="' + (.15 + r() * .5).toFixed(2) + '"/>';
   return out;
 })();
+// Le mythe d'une constellation complète, en petit film (plein écran, comme l'intro)
+function voirMythe(ci){
+  const K = CIEL[ci]; music(null);
+  const w = el('div', 'intro-v nouv');
+  w.innerHTML = '<video playsinline preload="auto" src="' + K.video + '" aria-describedby="mythe-txt"></video>'
+    + '<button class="intro-skip" type="button">Passer</button><p id="mythe-txt" class="sr-only">' + esc(K.mythe) + ' Dieu.</p>';
+  document.body.append(w);
+  const v = w.querySelector('video');
+  let fini = false;
+  const done = () => {
+    if(fini) return; fini = true;
+    try{ v.pause(); }catch(e){} w.remove();
+    const l = Array.isArray(S.mythes) ? S.mythes : []; if(!l.includes(ci)) l.push(ci); S.mythes = l; saveS();
+    showCiel(ci);
+  };
+  v.muted = !Snd.on; v.onended = done; v.onerror = done;
+  w.querySelector('.intro-skip').onclick = done;
+  const pr = v.play(); if(pr) pr.catch(() => { v.muted = true; v.play().catch(done); });
+  focusSoft(w.querySelector('.intro-skip'));
+}
 function showCiel(sel){
   screen(); music(nuitTrack(), 'nuit');
   const lues = etoilesLues(), lit = lues.length, cur = constCourante(lit);
@@ -1197,6 +1218,12 @@ function showCiel(sel){
   if(ici >= PAR_CONST){
     const m = el('div', 'mythe'); m.innerHTML = '<p class="who">Dieu te raconte ' + esc(K.qui) + '</p><p>' + esc(K.mythe) + '</p><p class="sig">Dieu</p>';
     d.append(m);
+    if(K.video){
+      const vu = Array.isArray(S.mythes) && S.mythes.includes(ci);
+      const bv = el('button', vu ? 'lbtn' : 'lbtn rouge', '▶ ' + (vu ? 'Revoir' : 'Regarder') + ' l’histoire en vidéo (' + K.duree + ', avec le son)');
+      bv.type = 'button'; bv.style.marginTop = '0'; bv.onclick = () => { reveilSon(); voirMythe(ci); };
+      if(vu) m.after(bv); else m.before(bv);
+    }
     if(ci === CIEL.length - 1) d.append(el('p', 'attente', 'Ton ciel est complet. Toutes ces étoiles sont à toi.'));
   } else {
     const reste = PAR_CONST - ici;
