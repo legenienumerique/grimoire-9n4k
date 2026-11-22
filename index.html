@@ -1301,11 +1301,16 @@ function jeuDuJour(where){
   };
   if(j.jeu === 'mensonge'){
     box.innerHTML = '<h2>Deux vérités, un mensonge</h2><p class="sub">Trois choses sur moi. Une seule est fausse : trouve-la, et je te dis un secret.</p>';
-    // Ordre mélangé mais fixe pour la journée
-    const items = [{t:j.vrais[0], f:false}, {t:j.vrais[1], f:false}, {t:j.faux, f:true}];
-    const seed = +ST.today.replace(/-/g, '') % 3;
-    for(let i = 0; i < seed + 1; i++) items.push(items.shift());
-    if(seed === 1) items.reverse();
+    // Ordre tiré au hasard une fois par jour (gardé ensuite, pour qu'il ne change pas à chaque visite)
+    const base = [{t:j.vrais[0], f:false}, {t:j.vrais[1], f:false}, {t:j.faux, f:true}];
+    S.ordre = S.ordre || {};
+    let o = S.ordre[ST.today];
+    if(!Array.isArray(o) || o.length !== 3 || o.slice().sort().join() !== '0,1,2'){
+      o = [0, 1, 2];
+      for(let i = 2; i > 0; i--){ const k = Math.floor(Math.random() * (i + 1)); [o[i], o[k]] = [o[k], o[i]]; }
+      S.ordre[ST.today] = o; saveS();
+    }
+    const items = o.map(i => base[i]);
     const ul = el('ul', 'v3');
     items.forEach(it => {
       const li = el('li'), b = el('button', '', it.t); b.type = 'button';
