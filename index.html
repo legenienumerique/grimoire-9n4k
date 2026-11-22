@@ -443,7 +443,7 @@ button{font:inherit;color:inherit}
   color:var(--gold);font-family:var(--sans);font-size:.88rem;cursor:pointer}
 
 /* Installer le grimoire sur l'écran d'accueil */
-.install .etapes{margin:0 0 12px;padding:0;list-style:none;text-align:left;font-family:var(--sans);font-size:.84rem;line-height:1.5;color:var(--ink)}
+.install .etapes{margin:0 0 12px;padding:0;list-style:none;text-align:left;font-family:var(--sans);font-size:1.05rem;line-height:1.5;color:var(--ink)}
 .install .etapes li{margin:0 0 6px}
 
 /* Page finale : la rose */
@@ -506,6 +506,99 @@ button{font:inherit;color:inherit}
 .loading{padding-top:30vh;text-align:center;font-style:italic;font-size:1.3rem;color:var(--muted)}
 #testb{position:fixed;left:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:50;margin:0;padding:4px 8px;border-radius:6px;background:#3d0d19;
   font-family:var(--sans);font-size:.68rem;color:var(--ink);pointer-events:none}
+
+/* =========================================================
+   REFONTE 22/11 : noir et or, épuré
+   Une seule voix typographique (Cormorant), moins de cadres, des boutons comme des marque-pages.
+   ========================================================= */
+:root{--bg:#050403;--ink:#efe6d6;--muted:#a69a86;--gold:#c9a96e;--gold-pale:#e6d3a8;--hair:rgba(201,169,110,.24);
+  --sans:"Cormorant Garamond","Cormorant",Garamond,Georgia,serif}
+body{font-size:17px;background:radial-gradient(ellipse 120% 60% at 50% -10%,#16110a 0%,var(--bg) 60%) fixed,var(--bg)}
+.top{background:linear-gradient(var(--bg) 70%,rgba(5,4,3,0))}
+.brand{font-size:1.35rem;letter-spacing:.01em}
+.tbtn{font-size:1.02rem;font-weight:600;letter-spacing:.01em}
+.jx{font-size:1rem;font-style:italic;letter-spacing:0;text-transform:none;color:var(--red-text)}
+.num{margin:2px 0 18px}
+.num span{font-size:1rem;font-style:italic;letter-spacing:0;text-transform:none;font-weight:500}
+.num b{font-size:3.4rem;letter-spacing:.02em}
+.num::after{content:"";display:block;width:64px;height:1px;margin:12px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.hint,.src,.sub,.sur,.cd,.rv,.range,.ecrire .sub,.ecrire .err{font-size:1.02rem}
+.hint{font-style:italic}
+.src{font-size:.98rem;letter-spacing:.01em}
+.stage{border-radius:4px;border-color:rgba(201,169,110,.14)}
+.voute{border-radius:4px}
+/* Boutons : un cadre fin, coins presque droits */
+.alt,.lbtn,.nouv-etoile,.plume-btn{min-height:48px;padding:0 22px;border-radius:2px;border:1px solid rgba(201,169,110,.42);background:transparent;
+  color:var(--gold-pale);font-family:var(--serif);font-size:1.12rem;font-weight:600;letter-spacing:.01em;box-shadow:none;transition:background .25s,border-color .25s}
+.alt:hover,.lbtn:hover,.nouv-etoile:hover{background:rgba(201,169,110,.08);border-color:var(--gold)}
+.lbtn.rouge,.plume-btn{border-color:rgba(232,83,106,.6);background:rgba(139,0,0,.22);color:#fbe9ec}
+.lbtn.rouge:hover{background:rgba(139,0,0,.38)}
+.after{gap:12px}
+.rap-non{font-family:var(--serif);font-size:1.02rem;font-style:italic;text-underline-offset:4px;text-decoration-color:rgba(201,169,110,.5)}
+.chip{border-radius:2px;font-size:1.05rem;font-weight:600;border-color:rgba(242,235,224,.18);background:transparent}
+.chip[aria-pressed="true"]{border-color:var(--red-text);background:rgba(139,0,0,.3)}
+/* Moins de boîtes : un filet d'or et un fleuron séparent les parties */
+.toi,.rappel{border:0;border-radius:0;background:none;border-top:1px solid var(--hair);position:relative}
+.toi{margin-top:46px;padding:30px 2px 6px}
+.rappel{max-width:380px;margin-top:30px;padding:24px 4px 4px}
+.toi::before,.rappel::before,.jour::before{content:"❦";position:absolute;left:50%;top:0;transform:translate(-50%,-55%);padding:0 12px;background:var(--bg);color:var(--gold);font-size:1.1rem;line-height:1}
+.toi h2{font-size:1.9rem}
+.toi .sub{font-size:1.02rem;font-style:italic}
+.toi legend,.toi label.q{font-size:1.25rem}
+.toi textarea,.ecrire textarea,.ecrire input{border-radius:2px;border-color:rgba(201,169,110,.28);background:rgba(255,255,255,.02)}
+.lu{padding:4px 0 4px 16px;background:none;border-radius:0;border-left:1px solid var(--blood2)}
+.lu .who,.mythe .who,.question-elle small{font-size:1rem;font-style:italic;letter-spacing:0;text-transform:none}
+.mythe{background:none;border-radius:0;border-left:1px solid var(--gold);padding:4px 0 4px 16px}
+.const-nom small{font-size:1rem;font-style:italic;letter-spacing:0;text-transform:none}
+.etoile-vol .mots{border-radius:3px}
+.intro-skip{border-radius:2px;font-family:var(--serif);font-size:1.02rem;font-weight:600}
+#petals .petal i{opacity:calc(var(--o)*.6)}
+/* Sommaire : une vraie table des matières */
+.som h1,.ciel h1{font-size:2.4rem;font-style:italic;font-weight:500}
+.som .sub,.ciel .sub{font-size:1.02rem;font-style:italic}
+.toc{list-style:none;margin:6px 0 34px;padding:0}
+.toc li+li{border-top:1px solid rgba(201,169,110,.08)}
+.toc button{display:flex;align-items:baseline;gap:12px;width:100%;min-height:54px;padding:10px 4px;background:none;border:0;cursor:pointer;text-align:left;color:var(--ink)}
+.toc button:hover .qui,.toc button:focus-visible .qui{color:var(--gold-pale)}
+.toc .r{flex:0 0 2.8em;font-size:1.45rem;font-weight:600;color:var(--gold);font-variant-numeric:lining-nums}
+.toc .qui{flex:0 1 auto;font-style:italic;font-size:1.12rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s}
+.toc .pts{flex:1 1 20px;min-width:20px;border-bottom:1px dotted rgba(201,169,110,.35);transform:translateY(-.32em)}
+.toc .d{flex:0 0 auto;font-size:1.05rem;color:var(--muted)}
+.toc .cachet{flex:0 0 auto;width:12px;height:12px;align-self:center;border-radius:47% 53% 50% 50%/52% 48% 52% 48%;background:radial-gradient(circle at 35% 30%,#d0213f,#8b0000 60%,#4a0008)}
+.toc .vide{width:12px;height:12px;flex:0 0 auto;align-self:center;border-radius:50%;border:1px solid rgba(201,169,110,.35)}
+.toc .fin .r,.toc .elle .r,.toc .elle .qui{color:var(--red-text)}
+.som .nouv-etoile,.som .lbtn{width:100%;max-width:340px}
+/* En journée : le jeu du jour et le secret de Dieu */
+.jour{position:relative;margin:38px 0 0;padding:30px 0 0;border-top:1px solid var(--hair);text-align:center}
+.jour h2{margin:0;font-weight:500;font-style:italic;font-size:1.9rem;color:var(--gold)}
+.jour .sub{margin:4px auto 20px;max-width:24em;font-style:italic;color:var(--muted)}
+.v3{display:grid;gap:10px;margin:0 0 6px;padding:0;list-style:none;text-align:left}
+.v3 button{display:block;width:100%;min-height:56px;padding:12px 16px;border-radius:2px;border:1px solid rgba(242,235,224,.16);background:transparent;
+  color:var(--ink);font-family:var(--serif);font-size:1.18rem;line-height:1.35;text-align:left;cursor:pointer;transition:border-color .25s,background .25s,opacity .4s}
+.v3 button:hover{border-color:rgba(201,169,110,.5)}
+.v3 button.vrai{opacity:.5;cursor:default}
+.v3 button.vrai::after{content:"C'est vrai, ça.";display:block;margin-top:4px;font-style:italic;font-size:1rem;color:var(--gold)}
+.v3 button.menteur{border-color:var(--red-text);background:rgba(139,0,0,.22)}
+.v3 button.menteur::after{content:"Démasqué. C'était le mensonge.";display:block;margin-top:4px;font-style:italic;font-size:1rem;color:var(--red-text)}
+.relie{position:relative;height:330px;border-radius:4px;border:1px solid rgba(201,169,110,.14);overflow:hidden;touch-action:manipulation;
+  background:radial-gradient(ellipse at 50% 110%,#17130c,#060504 62%,#030302)}
+.relie svg{position:absolute;inset:0;width:100%;height:100%}
+.relie .lien{stroke:var(--gold);stroke-width:.6;stroke-linecap:round;filter:drop-shadow(0 0 1.2px rgba(255,214,140,.9))}
+.relie .dessin{opacity:0;transition:opacity 1.6s ease;fill:none;stroke:var(--gold-pale);stroke-width:.55;stroke-linecap:round;stroke-linejoin:round}
+.relie.fini .dessin{opacity:.9}
+.pt-r{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;color:var(--muted);font-family:var(--serif);font-size:.85rem}
+.pt-r::before{content:"";position:absolute;left:17px;top:17px;width:10px;height:10px;border-radius:50%;background:rgba(242,235,224,.4);transition:background .3s,box-shadow .3s}
+.pt-r span{position:absolute;left:30px;top:2px;font-size:1rem}
+.pt-r.next::before{background:#ffe7b0;box-shadow:0 0 12px 4px rgba(255,214,140,.7);animation:pulse 1.3s ease-in-out infinite}
+.pt-r.ok::before{background:var(--gold);box-shadow:0 0 8px rgba(255,214,140,.7)}
+.pt-r.ok span{opacity:0}
+.secret{margin-top:26px}
+.secret .mot{text-align:left}
+.secrets-vus{margin:26px auto 0;max-width:30em;text-align:left}
+.secrets-vus summary{min-height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-style:italic;font-size:1.1rem;color:var(--gold-pale)}
+.secrets-vus ol{margin:8px 0 0;padding:0 0 0 1.4em}
+.secrets-vus li{margin:0 0 10px;font-style:italic;font-size:1.12rem;line-height:1.4}
+.secrets-vus li small{display:block;font-style:normal;font-size:.95rem;color:var(--muted)}
 
 /* Animations réduites */
 html.rm *,html.rm *::before,html.rm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
@@ -904,7 +997,7 @@ if(!T.test && ETOILES_OFFERTES.some(d => !S.lus.includes(d))){
   ETOILES_OFFERTES.forEach(d => { if(!S.lus.includes(d)) S.lus.push(d); }); S.lus.sort(); saveS();
 }
 /* Ouverture depuis l'icône de l'iPhone : on récupère les pages lues glissées dans l'adresse */
-if(!T.test){
+if(!T.test || Q.has('ciel')){
   const ciel = (Q.get('ciel') || '').split('.').filter(x => /^\d{6}$/.test(x)).map(x => '20' + x.slice(0, 2) + '-' + x.slice(2, 4) + '-' + x.slice(4));
   if(ciel.length){ ciel.forEach(d => { if(!S.lus.includes(d)) S.lus.push(d); }); S.lus.sort(); S.intro = S.intro || 1; saveS(); }
 }
@@ -1057,16 +1150,18 @@ $('#bCiel').addEventListener('click', () => { location.hash = 'ciel'; });
 /* ---------- La vidéo des nouveautés ----------
    Proposée une fois, à sa première arrivée (à toute heure), avant le reste.
    Ensuite, elle peut la revoir quand elle veut : Sommaire, Ton ciel, grimoire endormi. */
-const NOUVEAUTES = { date:'2026-11-17', video:'nouveautes.mp4?v=2' };
+// Changer la date quand une nouvelle vidéo remplace l'ancienne : elle lui sera reproposée une fois
+const NOUVEAUTES = { date:'2026-11-22', video:'nouveautes.mp4?v=3' };
+const nouvVue = () => S.nouv === NOUVEAUTES.date;
 function showNouveautes(suite, direct){
   introOn = true; music(null); screen();
   const d = el('section', 'screen');
   d.innerHTML = '<svg class="art" viewBox="-40 -40 80 80" aria-hidden="true" style="width:90px"><path d="M0 -36L7 -7 36 0 7 7 0 36 -7 7 -36 0 -7 -7Z" fill="#fff3d6" style="filter:drop-shadow(0 0 8px rgba(255,200,120,.9))"/></svg>'
-    + '<h1 class="msg">Ton grimoire a grandi, princesse.</h1>'
-    + '<p class="sur">Une minute et demie pour découvrir ses nouveautés, avec le son. Tu pourras la revoir quand tu veux, depuis le Sommaire.</p>';
+    + '<h1 class="msg">Ton grimoire a fait peau neuve, princesse.</h1>'
+    + '<p class="sur">Une minute pour découvrir ce qui change, avec le son. Tu pourras la revoir quand tu veux, depuis le Sommaire.</p>';
   let fini = false;
   const done = () => {
-    if(fini) return; fini = true; introOn = false; S.nouv = 1; saveS();
+    if(fini) return; fini = true; introOn = false; S.nouv = NOUVEAUTES.date; saveS();
     const w = document.querySelector('.intro-v.nouv'); if(w){ try{ w.querySelector('video').pause(); }catch(e){} w.remove(); }
     suite();
   };
@@ -1076,7 +1171,7 @@ function showNouveautes(suite, direct){
     const w = el('div', 'intro-v nouv');
     w.innerHTML = '<video playsinline preload="auto" src="' + NOUVEAUTES.video + '" aria-describedby="nouv-txt"></video>'
       + '<button class="intro-skip" type="button">Passer</button>'
-      + '<p id="nouv-txt" class="sr-only">Ton grimoire a grandi. Les gestes qui t’attendent, un nouveau chaque soir : la moto ce soir, puis la vitre embuée, le chat noir, la bougie et la plume. Et quatre gestes venus de Grèce les soirs suivants : le fil d’Ariane, la lyre d’Orphée, la flèche d’Éros et l’étoile filante. Ton ciel : une étoile par page lue. Tes deux premières pages t’ont déjà offert deux étoiles de la Couronne boréale, la troisième s’allume ce soir. Sept étoiles, une constellation, et Dieu te raconte son mythe. Touche l’étoile en haut de ton grimoire. Garde-le sur ton écran d’accueil : il s’ouvre comme une vraie appli, même sans réseau. Maintenant, ta page t’attend. Dieu.</p>';
+      + '<p id="nouv-txt" class="sr-only">Ton grimoire a fait peau neuve : plus sobre, plus doux, tout ce que tu aimes est toujours là. Chaque soir à 21 h, rien ne change : ta page, ton geste, ton étoile. Le sommaire devient une table des matières, avec un cachet rouge pour chaque page lue. Et le jour, en attendant 21 h, un jeu : deux vérités et un mensonge, trouve lequel est faux, ou des étoiles à relier dans l’ordre jusqu’à ce qu’un dessin apparaisse. Gagne, et Dieu te livre un secret sur lui. Un par jour, ils restent dans ton carnet. Le jour, ton jeu. Le soir, ta page. Dieu.</p>';
     document.body.append(w);
     const v = w.querySelector('video');
     v.muted = !Snd.on;
@@ -1097,7 +1192,7 @@ function boutonNouveautes(where){
 }
 
 function tonight(){
-  if(!S.nouv && ST.today >= NOUVEAUTES.date) return showNouveautes(tonight);
+  if(!nouvVue() && ST.today >= NOUVEAUTES.date) return showNouveautes(tonight);
   if(!ST.un) return showSleep();
   const p = ST.list.find(x => x.date === ST.today);
   // La page du soir rejoue toujours le geste, même déjà lue (consigne : tout le parcours à chaque arrivée)
@@ -1163,12 +1258,125 @@ const BIGROSE = '<svg class="bigrose" viewBox="0 0 200 300" role="img" aria-labe
   + '<g class="rs petals" stroke="#d0213f" stroke-width="2.4">' + tags(ROSE_P.bloom) + '</g>'
   + '<g class="rs" stroke="#7f9471" stroke-width="2.2">' + tags(ROSE_P.stem) + '</g></svg>';
 
+/* ---------- En journée : un jeu par jour, un secret de Dieu ----------
+   jeu:'mensonge' → vrais (2), faux (1), secret. jeu:'etoiles' → dessin (moto, chouette, rose), secret.
+   Un jour sans secret rempli n'affiche pas de jeu. */
+const SECRETS = {
+  '2026-11-22': {"jeu": "mensonge", "vrais": ["J'ai plus de 1000 elo aux échecs.", "J'ai déjà grimpé une montagne de 3000 mètres à la force de mes mains."], "faux": "J'ai déjà partagé mon dernier McNugget avec quelqu'un.", "secret": "Je suis fan de l'histoire de France et je porte mon pays très haut dans mes valeurs. Malgré qu'il souffre, je crois que nous sommes la nation la plus résiliente de la planète et que nous nous relèverons tôt ou tard. Je suis un vrai patriote."},
+  '2026-11-23': {"jeu": "etoiles", "dessin": "moto", "secret": "Je ne suis pas proche de ma famille émotionnellement. Je respecte ma famille, et nous nous aimons tous malgré les défis, mais je ne leur parle pas de mes sentiments, de mes envies ou de mes blessures."},
+  '2026-11-24': {"jeu": "mensonge", "vrais": ["J'adore le piano, je pourrais en écouter pendant des heures.", "J'ai une playlist de musique classique."], "faux": "L'opéra est un de mes styles de musique préférés.", "secret": "Au quotidien, j'aime quand les choses sont organisées. Je suis un peu maniaque, j'aime le propre et les choses bien faites. Parfois, je l'avoue, j'aime aussi partir ou faire une activité sur un coup de tête."},
+  '2026-11-25': {"jeu": "etoiles", "dessin": "chouette", "secret": "J'aimerais visiter des musées sur l'histoire, l'astronomie et la science."},
+  '2026-11-26': {"jeu": "mensonge", "vrais": ["Le physique de mes rêves : Djilsi (youtubeur).", "La moto de mes rêves : une BMW M 1000 RR."], "faux": "Le physique de mes rêves : GMK (youtubeur).", "secret": "Je suis ambitieux, mais je manque de discipline et de cadre. Je suis aussi partisan du moindre effort, je peux être un peu fainéant."},
+  '2026-11-27': {"jeu": "etoiles", "dessin": "rose", "secret": "L'amour me fait peur, mais j'y crois."},
+  '2026-11-28': {"jeu": "mensonge", "vrais": ["Je n'ai pas approché de femmes depuis plus de 4 ans.", "Je peux parfois être un peu beauf."], "faux": "J'adore le leg day à la salle de sport.", "secret": "Je suis un solitaire. J'ai grandi seul, je me suis construit seul, j'ai échoué seul, j'ai gagné seul. Te rencontrer demain me fait paniquer, car j'ai perdu l'habitude d'être deux : ça me demande énormément de courage."},
+};
+// Test : &secrets=demo remplit les jours vides avec des textes d'essai
+if(T.test && Q.get('secrets') === 'demo') Object.values(SECRETS).forEach((s, i) => {
+  if(!s.secret) s.secret = 'Secret d\'essai n° ' + (i + 1) + '.';
+  if(s.jeu === 'mensonge' && !s.faux){ s.vrais = ['Vérité d\'essai A.', 'Vérité d\'essai B.']; s.faux = 'Mensonge d\'essai.'; }
+});
+// Les points à relier (dans l'ordre), puis le dessin complet qui apparaît à la fin (viewBox 100 x 100)
+const DESSINS = {
+  moto: { nom:'une moto', pts:[[18, 66], [31, 47], [47, 45], [55, 37], [69, 38], [76, 46], [82, 66], [62, 64], [42, 66]],
+    trait:'<circle cx="18" cy="66" r="12"/><circle cx="82" cy="66" r="12"/><circle cx="18" cy="66" r="2"/><circle cx="82" cy="66" r="2"/><path d="M69 38l6-6h7M55 37q7-5 14 1M42 66l6-10h12l2 8"/>' },
+  chouette: { nom:'une chouette', pts:[[35, 20], [42, 30], [58, 30], [65, 20], [68, 50], [62, 76], [50, 84], [38, 76], [32, 50]],
+    trait:'<circle cx="43" cy="42" r="6"/><circle cx="57" cy="42" r="6"/><circle cx="43" cy="42" r="1.6"/><circle cx="57" cy="42" r="1.6"/><path d="M50 47l-3 4h6z"/><path d="M42 60l4 3 4-3 4 3 4-3M44 68l3 2.5 3-2.5 3 2.5 3-2.5M44 84v5M56 84v5"/>' },
+  rose: { nom:'une rose', ouvert:true, pts:[[50, 90], [50, 56], [40, 52], [32, 40], [36, 26], [50, 20], [64, 26], [68, 40], [60, 52]],
+    trait:'<path d="M60 52L50 56"/><path d="M50 30q-8 4-4 12q6 6 12-2q2-8-8-10M46 42q-6 6 2 10q8 2 10-6"/><path d="M50 72q-12-6-18 0q8 6 18 0M50 66q10-8 16-4q-6 8-16 4"/>' },
+};
+function jeuDuJour(where){
+  const j = SECRETS[ST.today];
+  if(!j || !j.secret || (j.jeu === 'mensonge' && (!j.faux || j.vrais.some(v => !v)))) return secretsVus(where);
+  S.secrets = S.secrets || {};
+  const box = el('section', 'jour'); box.setAttribute('aria-label', 'Le jeu du jour');
+  const gagne = !!S.secrets[ST.today];
+  const revele = anim => {
+    if(box.querySelector('.secret')) return;
+    if(!S.secrets[ST.today]){ S.secrets[ST.today] = 1; saveS(); }
+    const s = el('div', 'secret');
+    s.innerHTML = '<div class="mot"><p>' + esc(j.secret) + '</p><p class="sig">Dieu</p></div>';
+    if(!anim) s.querySelector('.mot').style.animation = 'none';
+    box.append(s);
+    if(anim){ announce('Secret débloqué : ' + j.secret); later(() => s.scrollIntoView({behavior:RM ? 'auto' : 'smooth', block:'center'}), 300); }
+  };
+  if(j.jeu === 'mensonge'){
+    box.innerHTML = '<h2>Deux vérités, un mensonge</h2><p class="sub">Trois choses sur moi. Une seule est fausse : trouve-la, et je te dis un secret.</p>';
+    // Ordre mélangé mais fixe pour la journée
+    const items = [{t:j.vrais[0], f:false}, {t:j.vrais[1], f:false}, {t:j.faux, f:true}];
+    const seed = +ST.today.replace(/-/g, '') % 3;
+    for(let i = 0; i < seed + 1; i++) items.push(items.shift());
+    if(seed === 1) items.reverse();
+    const ul = el('ul', 'v3');
+    items.forEach(it => {
+      const li = el('li'), b = el('button', '', it.t); b.type = 'button';
+      if(gagne && it.f) b.classList.add('menteur');
+      b.onclick = () => {
+        if(box.querySelector('.menteur') || b.classList.contains('vrai')) return;
+        if(it.f){ b.classList.add('menteur'); revele(true); }
+        else { b.classList.add('vrai'); b.setAttribute('aria-disabled', 'true'); announce('C\'est vrai, ça. Essaie encore.'); }
+      };
+      li.append(b); ul.append(li);
+    });
+    box.append(ul);
+  } else {
+    const des = DESSINS[j.dessin] || DESSINS.moto;
+    box.innerHTML = '<h2>Relier les étoiles</h2><p class="sub">Touche les étoiles dans l\'ordre, de 1 à ' + des.pts.length + '. Elles dessinent quelque chose, et derrière il y a un secret.</p>';
+    const st = el('div', 'relie' + (gagne ? ' fini' : '')); st.setAttribute('role', 'group'); st.setAttribute('aria-label', 'Constellation à relier');
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('preserveAspectRatio', 'xMidYMid meet'); svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = '<g class="liens"></g><g class="dessin">' + des.trait + '</g>';
+    st.append(svg);
+    const liens = svg.querySelector('.liens');
+    const trace = (a, b) => { const l = document.createElementNS(ns, 'line'); l.setAttribute('class', 'lien'); l.setAttribute('x1', a[0]); l.setAttribute('y1', a[1]); l.setAttribute('x2', b[0]); l.setAttribute('y2', b[1]); liens.append(l); };
+    // Les points sont placés en % du carré centré : on recalcule selon la taille réelle
+    const btns = [];
+    let k = gagne ? des.pts.length : 0;
+    des.pts.forEach((p, i) => {
+      const b = el('button', 'pt-r'); b.type = 'button'; b.innerHTML = '<span aria-hidden="true">' + (i + 1) + '</span>';
+      b.setAttribute('aria-label', 'Étoile ' + (i + 1));
+      b.onclick = () => {
+        if(i !== k){ b.classList.add('nudge'); later(() => b.classList.remove('nudge'), 450); return; }
+        b.classList.add('ok'); b.classList.remove('next');
+        if(i > 0) trace(des.pts[i - 1], p);
+        k++;
+        if(k === des.pts.length){
+          if(!des.ouvert) trace(p, des.pts[0]);
+          st.classList.add('fini'); announce('C\'est ' + des.nom + '.');
+          later(() => revele(true), 900);
+        } else btns[k].classList.add('next');
+      };
+      btns.push(b); st.append(b);
+    });
+    const place = () => {
+      const w = st.clientWidth, h = st.clientHeight, c = Math.min(w, h), ox = (w - c) / 2, oy = (h - c) / 2;
+      btns.forEach((b, i) => { b.style.left = (ox + des.pts[i][0] / 100 * c) + 'px'; b.style.top = (oy + des.pts[i][1] / 100 * c) + 'px'; });
+    };
+    if(gagne){ des.pts.forEach((p, i) => { btns[i].classList.add('ok'); if(i < des.pts.length - 1 || !des.ouvert) trace(p, des.pts[(i + 1) % des.pts.length]); }); }
+    else btns[0].classList.add('next');
+    box.append(st);
+    later(place, 0); window.addEventListener('resize', place);
+  }
+  where.append(box);
+  if(gagne) revele(false);
+  secretsVus(where);
+}
+// Les secrets déjà découverts les jours précédents
+function secretsVus(where){
+  const vus = Object.keys(S.secrets || {}).filter(d => d < ST.today && SECRETS[d] && SECRETS[d].secret).sort();
+  if(!vus.length) return;
+  const det = el('details', 'secrets-vus');
+  det.innerHTML = '<summary>Les secrets que tu connais déjà (' + vus.length + ')</summary><ol>'
+    + vus.map(d => '<li>' + esc(SECRETS[d].secret) + '<small>' + esc(fmtLong(d)) + '</small></li>').join('') + '</ol>';
+  where.append(det);
+}
+
 /* ---------- Écrans d'attente ---------- */
 function showSleep(){
   screen(); music(nuitTrack(), 'nuit');
   const d = el('section', 'screen');
   d.innerHTML = CAT_SLEEP + '<h1 class="msg">Le grimoire dort encore. Reviens à la tombée de la nuit, princesse.</h1>'
     + '<p class="cd" role="timer" aria-live="off">Il s\'éveille dans <b aria-hidden="true"></b><span class="sr-only">quelques heures, à ' + HEURE_DEBLOCAGE + ' heures.</span></p>';
+  jeuDuJour(d);
   if(ST.list.length){ const b = el('button', 'lbtn', 'Feuilleter les pages passées'); b.type = 'button'; b.onclick = () => { location.hash = 'sommaire'; }; d.append(b); }
   boutonPlume(d);
   inviteSon(d); inviteRappel(d); inviteInstall(d); if(S.nouv) boutonNouveautes(d);
@@ -1198,12 +1406,16 @@ function showSommaire(){
   screen(); music(nuitTrack(), 'nuit');
   const d = el('section', 'som');
   const lues = ST.list.filter(estLue).length;
-  d.innerHTML = '<h1>Sommaire</h1><p class="sub">' + ST.list.length + (ST.list.length > 1 ? ' pages' : ' page') + ' · ' + lues + (lues > 1 ? ' scellées' : ' scellée') + '</p>';
-  const ol = el('ol', 'tiles');
+  d.innerHTML = '<h1>Sommaire</h1><p class="sub">' + ST.list.length + (ST.list.length > 1 ? ' pages' : ' page') + ', dont ' + lues + (lues > 1 ? ' scellées' : ' scellée') + '</p>';
+  const ol = el('ol', 'toc');
   ST.list.forEach(p => {
-    const li = el('li'), b = el('button', 'tile' + (p.kind === 'fin' ? ' fin' : p.kind === 'elle' ? ' elle' : '')); b.type = 'button';
+    const li = el('li'), b = el('button', p.kind === 'fin' ? 'fin' : p.kind === 'elle' ? 'elle' : ''); b.type = 'button';
     const read = estLue(p);
-    b.innerHTML = '<b aria-hidden="true">' + roman(p.n) + '</b><small aria-hidden="true">' + esc(fmtDay(p.date)) + '</small>' + (read ? '<span class="cachet" aria-hidden="true"></span>' : '');
+    // Le nom de l'auteur n'apparaît qu'une fois la page lue (pas de surprise gâchée)
+    const qui = p.kind === 'elle' ? 'Ta page' : p.kind === 'fin' ? 'La dernière page' : p.kind === 'bascule' ? 'Le masque' : (read && p.auteur ? p.auteur : '');
+    b.innerHTML = '<span class="r" aria-hidden="true">' + roman(p.n) + '</span>' + (qui ? '<span class="qui" aria-hidden="true">' + esc(qui) + '</span>' : '')
+      + '<span class="pts" aria-hidden="true"></span><span class="d" aria-hidden="true">' + esc(fmtDay(p.date)) + '</span>'
+      + '<span class="' + (read ? 'cachet' : 'vide') + '" aria-hidden="true"></span>';
     b.setAttribute('aria-label', (p.kind === 'fin' ? 'Dernière page, ' : p.kind === 'elle' ? 'Ta page, ' : 'Page ' + p.n + ', ') + fmtLong(p.date) + (p.kind === 'elle' ? '' : read ? ', lue' : ', pas encore lue'));
     b.onclick = () => { location.hash = 'page-' + p.n; };
     li.append(b); ol.append(li);
@@ -2065,7 +2277,7 @@ function showPageElle(p, opt){
    ========================================================= */
 if(!RM){
   const pb = $('#petals');
-  for(let i = 0; i < 9; i++){
+  for(let i = 0; i < 5; i++){
     const p = el('span', 'petal'), s = rnd(9, 16);
     p.style.cssText = '--x:' + rnd(0, 100).toFixed(1) + '%;--d:' + rnd(16, 30).toFixed(1) + 's;--dl:' + (-rnd(0, 30)).toFixed(1) + 's;';
     const i2 = el('i'); i2.style.cssText = '--s:' + s.toFixed(1) + 'px;--sw:' + rnd(3, 6).toFixed(1) + 's;--o:' + rnd(.25, .5).toFixed(2) + ';';
