@@ -42,7 +42,7 @@ if(/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacInt
    ========================================================= */
 const URL_FLUX_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTo1z90uspv1yqy0Mezyx_eKRYRdi0VbIKU1Fl_0wvDp01DBm4rf5-LsOQIqEGsSDuINfC32F5lRNNO/pub?gid=524656322&single=true&output=csv";        // lien CSV publié de l'onglet Flux (entre les guillemets)
 const HEURE_DEBLOCAGE = 21;     // heure locale du téléphone
-const DATE_RENCONTRE = null;    // ex. "2026-12-05" (avec les guillemets) quand on aura fixé la date
+const DATE_RENCONTRE = "2026-11-29";    // la rencontre : la page finale s'ouvre la veille à 21 h
 const INSTAGRAM_DIEU = "only.goldrider";    // ton nom d'utilisateur Instagram, sans @ (le bouton ouvre ta conversation)
 const NUMERO_DIEU_MASQUE = "MTc5NzY3MjY2MzM=";   // ton numéro, brouillé pour les robots (pour le changer, demande à Claude)
                                 // (les deux vides = elle choisit à qui envoyer avec le bouton « Partager » du téléphone)
@@ -1171,7 +1171,8 @@ const CIEL = [
     video:'mythe-couronne.mp4', duree:'1 min 12' },
   { nom:'La Lyre', qui:'la lyre d\'Orphée',
     pts:[[46, 14], [60, 20], [66, 30], [42, 36], [58, 41], [36, 76], [56, 81]], traits:[[0, 1], [1, 2], [0, 3], [3, 4], [4, 0], [3, 5], [4, 6], [5, 6]],
-    mythe:'Orphée jouait si bien que les pierres le suivaient et que les fleuves s\'arrêtaient pour l\'écouter. Il est descendu jusqu\'aux Enfers chercher Eurydice, avec sa musique pour seule arme. Quand il est mort, les Muses ont posé sa lyre parmi les étoiles. Certaines musiques ne s\'arrêtent jamais vraiment.' },
+    mythe:'Orphée jouait si bien que les pierres le suivaient. Quand on lui a pris Eurydice, il est descendu la chercher, et sa musique a ouvert les portes des Enfers. Elle le suivrait jusqu\'au jour, à une seule condition : ne pas se retourner. Il s\'est retourné. Les Muses ont posé sa lyre parmi les étoiles. Toi, tu as suivi ma voix quatorze soirs, sans voir mon visage. Demain, tu n\'auras plus besoin de te retourner. Je serai devant toi.',
+    video:'mythe-lyre.mp4', duree:'1 min 20' },
   { nom:'Les Pléiades', qui:'les sept sœurs',
     pts:[[30, 42], [38, 30], [46, 20], [42, 52], [52, 48], [70, 54], [72, 42]], traits:[[0, 1], [1, 2], [0, 3], [3, 4], [4, 1], [4, 5], [5, 6]],
     mythe:'Sept sœurs, les filles d\'Atlas, poursuivies par Orion à travers toute la Grèce. Zeus les a changées en colombes, puis en étoiles, pour qu\'elles trouvent enfin la paix. Elles restent serrées les unes contre les autres : on ne voit jamais l\'une sans les autres. En ce moment, elles se lèvent à l\'est à la tombée de la nuit. Cherche-les.' },
@@ -1347,8 +1348,11 @@ function showPage(p, opt){
       later(() => {
         if(neuf){
           const lit = etoilesLues().length;
-          const b = el('button', 'nouv-etoile', lit % PAR_CONST === 0 ? '✦ Une constellation est née dans ton ciel' : '✦ Une étoile s\'est allumée dans ton ciel');
-          b.type = 'button'; b.onclick = () => { location.hash = 'ciel'; }; reading.after(b);
+          // La dernière page qui complète une constellation : le bouton lance directement son film
+          const ci = constCourante(lit), film = p.kind === 'fin' && lit % PAR_CONST === 0 && CIEL[ci].video;
+          const b = el('button', 'nouv-etoile', film ? '▶ Dieu te raconte ' + CIEL[ci].qui + ' (' + CIEL[ci].duree + ', avec le son)'
+            : lit % PAR_CONST === 0 ? '✦ Une constellation est née dans ton ciel' : '✦ Une étoile s\'est allumée dans ton ciel');
+          b.type = 'button'; b.onclick = film ? () => { reveilSon(); voirMythe(ci); } : () => { location.hash = 'ciel'; }; reading.after(b);
           etoileDebloquee(lit);
         }
         buildToi(p, art.querySelector('.toi')); inviteRappel(art); inviteInstall(art);
