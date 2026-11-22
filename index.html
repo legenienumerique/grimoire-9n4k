@@ -100,6 +100,16 @@ const APRES_RENCONTRE = [
   { citation: "Aimer ou avoir aimé, cela suffit. Ne demandez rien ensuite.", auteur: "Victor Hugo", oeuvre: "Les Misérables", mot: "" },
   { citation: "Voici des fruits, des fleurs, des feuilles et des branches, / Et puis voici mon cœur qui ne bat que pour vous.", auteur: "Paul Verlaine", oeuvre: "Green", mot: "" }
 ];
+
+/* SAISON À DEUX — à partir du soir de la rencontre (21 h), elle peut écrire ses propres pages.
+   Ses pages partent dans un Google Form relié au Sheet (sans qu'elle voie le formulaire).
+   action = l'adresse du formulaire se terminant par /formResponse ; champs = les « entry.123… » de chaque question.
+   URL_ELLE_CSV = le lien CSV publié de l'onglet des réponses (pour que ses pages s'affichent aussi chez toi). */
+const FORM_ELLE = { action:"https://docs.google.com/forms/d/e/1FAIpQLScAKo4D6VZzakHtvnZlVzCJosxxQaIxF6TY0Xz5-_C9zpKrnQ/formResponse",champs:{ id:"entry.689880177", date:"entry.1083713685", citation:"entry.1981235029", auteur:"entry.1625060768", oeuvre:"entry.1342959814", mot:"entry.186777735", question:"entry.1544615299" } };
+const URL_ELLE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTo1z90uspv1yqy0Mezyx_eKRYRdi0VbIKU1Fl_0wvDp01DBm4rf5-LsOQIqEGsSDuINfC32F5lRNNO/pub?gid=773458691&single=true&output=csv";
+const SIGNATURE_ELLE = "Princesse";
+/* La page du soir de la rencontre : Dieu est démasqué et lui tend la plume. */
+const TEXTE_BASCULE = "Voilà. Tu as vu le visage derrière les pages. J'espère qu'il ne t'a pas trop déçue.\n\nLe grimoire ne s'arrête pas ce soir. Il change de main. Jusqu'ici, j'écrivais et tu lisais. Désormais, la plume est aussi à toi : une phrase qui te ressemble, un passage d'animé, une chanson, ton mot à toi. Ce que tu écris s'inscrit à l'encre rouge, et chaque page allume une étoile rouge à côté des miennes.\n\nOn remplit le ciel à deux, maintenant.";
 </script>
 <style>
 :root{
@@ -463,6 +473,36 @@ button{font:inherit;color:inherit}
 .tile .cachet{position:absolute;top:7px;right:7px;width:20px;height:20px;border-radius:47% 53% 50% 50%/52% 48% 52% 48%;
   background:radial-gradient(circle at 35% 30%,#d0213f,#8b0000 60%,#4a0008);box-shadow:0 1px 3px rgba(0,0,0,.6)}
 .tile.fin b{color:var(--red-text)}
+/* Saison à deux : ses pages à elle, à l'encre rouge */
+.tile.elle{border-color:rgba(179,0,27,.55);background:rgba(179,0,27,.1)}
+.tile.elle b{color:var(--red-text)}
+.page.elle .num b,.page.elle .num span{color:var(--red-text)}
+.page.elle .cit{color:#ffdfe4}
+.mot.elle{background:linear-gradient(#f7e6e4,#ecd0cc)}
+.question-elle{margin:22px auto 0;max-width:30em;padding:12px 16px;border-left:2px solid var(--gold);font-style:italic;font-size:1.1rem;line-height:1.4}
+.question-elle small{display:block;margin-bottom:4px;font-family:var(--sans);font-style:normal;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.etoile.on.elle::before{background:#ffe3e8;box-shadow:0 0 10px 3px rgba(232,83,106,.9),0 0 24px 8px rgba(179,0,27,.35)}
+.etoile-vol.elle .astre svg path{fill:#ffd2da}
+.etoile-vol.elle .astre svg{filter:drop-shadow(0 0 18px rgba(232,83,106,.95)) drop-shadow(0 0 48px rgba(179,0,27,.6))}
+.plume-btn{display:block;margin:18px auto 0;min-height:52px;padding:0 24px;border-radius:999px;border:1px solid var(--blood2);background:linear-gradient(rgba(179,0,27,.42),rgba(139,0,0,.32));
+  color:#fff;font-family:var(--sans);font-size:.95rem;cursor:pointer;box-shadow:0 0 24px rgba(179,0,27,.25)}
+.ecrire{padding-top:8px}
+.ecrire h1{margin:6px 0 2px;text-align:center;font-weight:600;font-style:italic;font-size:2.1rem;color:var(--red-text)}
+.ecrire .sub{margin:0 0 22px;text-align:center;font-family:var(--sans);font-size:.82rem;line-height:1.45;color:var(--muted)}
+.ecrire label{display:block;margin:0 0 8px;font-size:1.15rem;line-height:1.35}
+.ecrire label small{font-family:var(--sans);font-size:.72rem;color:var(--muted)}
+.ecrire .champ{margin:0 0 18px}
+.ecrire textarea,.ecrire input{display:block;width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(242,235,224,.3);background:#0f0d0c;
+  color:var(--ink);font-family:var(--serif);font-size:1.15rem;line-height:1.4;-webkit-user-select:text;user-select:text}
+.ecrire textarea{min-height:110px;resize:vertical}
+.ecrire textarea::placeholder,.ecrire input::placeholder{color:#8f867a;font-style:italic}
+.ecrire .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ecrire .err{min-height:1.3em;margin:0 0 8px;text-align:center;font-family:var(--sans);font-size:.82rem;color:var(--red-text)}
+.masque-s{display:flex;align-items:center;justify-content:center;cursor:pointer}
+.masque-s svg{width:62%;max-width:240px;filter:drop-shadow(0 0 18px rgba(201,169,110,.45));transition:transform 1.4s cubic-bezier(.5,0,.6,1),opacity 1.4s}
+.masque-s.tombe svg{transform:translateY(160%) rotate(28deg);opacity:0}
+.masque-s .visage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-style:italic;font-size:1.6rem;color:var(--red-text);opacity:0;transition:opacity 1.2s .6s}
+.masque-s.tombe .visage{opacity:1}
 .loading{padding-top:30vh;text-align:center;font-style:italic;font-size:1.3rem;color:var(--muted)}
 #testb{position:fixed;left:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:50;margin:0;padding:4px 8px;border-radius:6px;background:#3d0d19;
   font-family:var(--sans);font-size:.68rem;color:var(--ink);pointer-events:none}
@@ -953,11 +993,21 @@ function build(rows, ok){
     list = list.filter(x => x.date !== eve);
     list.push({kind:'fin', date:eve, texte:(TEXTE_FINAL || '').trim() || (er ? er.citation : '')});
   }
-  list.sort((a, b) => a.date < b.date ? -1 : 1);
-  list.forEach((p, i) => { p.n = i + 1; });
-  const vis = list.filter(p => p.date < today || (p.date === today && un));
+  // Le soir de la rencontre : la page de bascule remplace la ligne du Sheet
+  if(RENCONTRE && RENCONTRE <= today){
+    const br = list.find(x => x.date === RENCONTRE);
+    list = list.filter(x => x.date !== RENCONTRE);
+    list.push({kind:'bascule', date:RENCONTRE, texte:TEXTE_BASCULE, reponse:br ? br.reponse : ''});
+  }
+  // Ses pages à elle (saison à deux) : toujours visibles, elle les a écrites
+  if(RENCONTRE) pagesElle().forEach(r => { if(r.date >= RENCONTRE && r.date <= today) list.push(Object.assign({kind:'elle'}, r)); });
+  const cle = p => p.date + (p.kind === 'elle' ? '|1|' + (p.t || p.id || '') : '|0');
+  list.sort((a, b) => cle(a) < cle(b) ? -1 : 1);
+  let gi = 0;
+  list.forEach((p, i) => { p.n = i + 1; if(p.kind !== 'elle') p.g = gi++; });
+  const vis = list.filter(p => p.kind === 'elle' || p.date < today || (p.date === today && un));
   if(ok){ S.rows = rows.filter(r => r.date < today || (r.date === today && un)); saveS(); }
-  ST = {list:vis, ok, today, un, key:today + '|' + un};
+  ST = {list:vis, ok, today, un, key:today + '|' + un, s2:!!RENCONTRE && (today > RENCONTRE || (today === RENCONTRE && un))};
   $('#bSom').hidden = !vis.length; $('#bCiel').hidden = !vis.length;
   const jx = $('#jx');
   if(RENCONTRE){ const x = daysBetween(today, RENCONTRE); jx.hidden = x < 1; jx.textContent = 'J-' + x + ' avant la visite divine'; }
@@ -970,8 +1020,11 @@ function boot(){
   if(booting) return booting;
   booting = (async () => {
     let rows, ok = true;
-    try{ rows = await fetchRows(); }catch(e){ ok = false; rows = S.rows || []; }
+    const [r1, r2] = await Promise.allSettled([fetchRows(), fetchElle()]);
+    if(r1.status === 'fulfilled') rows = r1.value; else { ok = false; rows = S.rows || []; }
+    if(r2.status === 'fulfilled' && r2.value){ S.elleRows = r2.value; saveS(); }
     build(rows, ok);
+    envoyerEnAttente();
     route();
   })().finally(() => { booting = null; });
   return booting;
@@ -991,6 +1044,7 @@ function route(){
   const h = location.hash;
   if(h === '#sommaire' && ST.list.length) return showSommaire();
   if(h === '#ciel' && ST.list.length) return showCiel();
+  if(h === '#ecrire' && ST.s2) return showEcrire();
   const m = h.match(/^#page-(\d+)$/);
   if(m){ const p = ST.list.find(x => x.n === +m[1]); if(p) return showPage(p, {from:'som'}); }
   tonight();
@@ -1116,6 +1170,7 @@ function showSleep(){
   d.innerHTML = CAT_SLEEP + '<h1 class="msg">Le grimoire dort encore. Reviens à la tombée de la nuit, princesse.</h1>'
     + '<p class="cd" role="timer" aria-live="off">Il s\'éveille dans <b aria-hidden="true"></b><span class="sr-only">quelques heures, à ' + HEURE_DEBLOCAGE + ' heures.</span></p>';
   if(ST.list.length){ const b = el('button', 'lbtn', 'Feuilleter les pages passées'); b.type = 'button'; b.onclick = () => { location.hash = 'sommaire'; }; d.append(b); }
+  boutonPlume(d);
   inviteSon(d); inviteRappel(d); inviteInstall(d); if(S.nouv) boutonNouveautes(d);
   view.append(d);
   const out = d.querySelector('.cd b');
@@ -1142,20 +1197,21 @@ function showInk(){
 function showSommaire(){
   screen(); music(nuitTrack(), 'nuit');
   const d = el('section', 'som');
-  const lues = ST.list.filter(p => isRead(p.date)).length;
+  const lues = ST.list.filter(estLue).length;
   d.innerHTML = '<h1>Sommaire</h1><p class="sub">' + ST.list.length + (ST.list.length > 1 ? ' pages' : ' page') + ' · ' + lues + (lues > 1 ? ' scellées' : ' scellée') + '</p>';
   const ol = el('ol', 'tiles');
   ST.list.forEach(p => {
-    const li = el('li'), b = el('button', 'tile' + (p.kind === 'fin' ? ' fin' : '')); b.type = 'button';
-    const read = isRead(p.date);
+    const li = el('li'), b = el('button', 'tile' + (p.kind === 'fin' ? ' fin' : p.kind === 'elle' ? ' elle' : '')); b.type = 'button';
+    const read = estLue(p);
     b.innerHTML = '<b aria-hidden="true">' + roman(p.n) + '</b><small aria-hidden="true">' + esc(fmtDay(p.date)) + '</small>' + (read ? '<span class="cachet" aria-hidden="true"></span>' : '');
-    b.setAttribute('aria-label', (p.kind === 'fin' ? 'Dernière page, ' : 'Page ' + p.n + ', ') + fmtLong(p.date) + (read ? ', lue' : ', pas encore lue'));
+    b.setAttribute('aria-label', (p.kind === 'fin' ? 'Dernière page, ' : p.kind === 'elle' ? 'Ta page, ' : 'Page ' + p.n + ', ') + fmtLong(p.date) + (p.kind === 'elle' ? '' : read ? ', lue' : ', pas encore lue'));
     b.onclick = () => { location.hash = 'page-' + p.n; };
     li.append(b); ol.append(li);
   });
   d.append(ol);
   const ciel = el('button', 'nouv-etoile', '✦ Ton ciel · ' + lues + (lues > 1 ? ' étoiles' : ' étoile')); ciel.type = 'button'; ciel.style.margin = '0 auto 14px';
   ciel.onclick = () => { location.hash = 'ciel'; }; d.append(ciel);
+  boutonPlume(d);
   const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
   d.append(back); boutonNouveautes(d);
   view.append(d);
@@ -1184,7 +1240,7 @@ const CIEL = [
     mythe:'Orion, le chasseur géant, savait marcher sur la mer. Après sa mort, Zeus l\'a posé dans le ciel, si grand qu\'on le voit des deux côtés du monde. Sa ceinture, trois étoiles bien alignées, est la plus facile à trouver. Un soir d\'hiver, lève les yeux : tu sauras le reconnaître, maintenant.' }
 ];
 const PAR_CONST = 7;
-function etoilesLues(){ return ST.list.filter(p => isRead(p.date)); }
+function etoilesLues(){ return ST.list.filter(estLue); }
 function constCourante(lit){
   const c = lit > 0 && lit % PAR_CONST === 0 ? lit / PAR_CONST - 1 : Math.floor(lit / PAR_CONST);
   return Math.min(c, CIEL.length - 1);
@@ -1217,12 +1273,12 @@ function voirMythe(ci){
   focusSoft(w.querySelector('.intro-skip'));
 }
 // Une page lue pour la première fois : une étoile naît au milieu de l'écran, puis s'envole vers le bouton ✦ du ciel
-function etoileDebloquee(lit){
+function etoileDebloquee(lit, rouge){
   if(!lit) return;
   const ci = constCourante(lit), K = CIEL[ci], ici = lit - ci * PAR_CONST, complete = ici >= PAR_CONST;
-  const o = el('div', 'etoile-vol'); o.setAttribute('role', 'status');
+  const o = el('div', 'etoile-vol' + (rouge ? ' elle' : '')); o.setAttribute('role', 'status');
   o.innerHTML = '<div class="astre"><span class="onde"></span><svg viewBox="-20 -20 40 40" aria-hidden="true"><path d="M0 -20L4 -4 20 0 4 4 0 20 -4 4 -20 0 -4 -4Z" fill="#fff3d6"/></svg></div>'
-    + '<div class="mots"><b>' + (complete ? 'Ta constellation est complète !' : 'Une étoile s’est allumée dans ton ciel') + '</b>'
+    + '<div class="mots"><b>' + (complete ? (ST.s2 ? 'Notre constellation est complète !' : 'Ta constellation est complète !') : rouge ? 'Ton étoile rouge s’est allumée' : ST.s2 ? 'Une étoile s’est allumée dans notre ciel' : 'Une étoile s’est allumée dans ton ciel') + '</b>'
     + '<small>' + esc(K.nom) + ' · ' + Math.min(ici, PAR_CONST) + '/' + PAR_CONST + '</small></div>';
   document.body.append(o);
   Snd.play('twinkle'); buzz([16, 30, 16]);
@@ -1249,7 +1305,9 @@ function showCiel(sel){
   const vu = typeof S.cielVu === 'number' ? S.cielVu : 0;
   const ici = Math.max(0, Math.min(PAR_CONST, lit - base));
   const d = el('section', 'ciel');
-  d.innerHTML = '<h1 tabindex="-1">Ton ciel</h1><p class="sub">' + lit + (lit > 1 ? ' étoiles allumées' : ' étoile allumée') + ' · une par page lue</p>';
+  d.innerHTML = ST.s2
+    ? '<h1 tabindex="-1">Notre ciel</h1><p class="sub">' + lit + (lit > 1 ? ' étoiles allumées' : ' étoile allumée') + ' · en or les pages de Dieu, en rouge les tiennes</p>'
+    : '<h1 tabindex="-1">Ton ciel</h1><p class="sub">' + lit + (lit > 1 ? ' étoiles allumées' : ' étoile allumée') + ' · une par page lue</p>';
   const v = el('div', 'voute');
   v.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g class="fond">' + FOND_CIEL + '</g>'
     + K.traits.map(([a, b]) => '<line class="trace' + (a < ici && b < ici ? ' on' : '') + '" x1="' + K.pts[a][0] + '" y1="' + K.pts[a][1] + '" x2="' + K.pts[b][0] + '" y2="' + K.pts[b][1] + '"/>').join('') + '</svg>';
@@ -1257,8 +1315,8 @@ function showCiel(sel){
     const b = el('button', 'etoile'); b.type = 'button'; b.style.left = pt[0] + '%'; b.style.top = pt[1] + '%';
     const p = lues[base + i];
     if(p){
-      b.classList.add('on'); if(base + i >= vu && !RM) b.classList.add('neuve');
-      b.setAttribute('aria-label', 'Étoile de la page ' + p.n + ', ' + fmtLong(p.date) + '. Ouvrir la page.');
+      b.classList.add('on'); if(p.kind === 'elle') b.classList.add('elle'); if(base + i >= vu && !RM) b.classList.add('neuve');
+      b.setAttribute('aria-label', (p.kind === 'elle' ? 'Étoile rouge de ta page du ' : 'Étoile de la page ' + p.n + ', ') + fmtLong(p.date) + '. Ouvrir la page.');
       b.onclick = () => { location.hash = 'page-' + p.n; };
     } else { b.disabled = true; b.setAttribute('aria-label', 'Étoile encore éteinte'); }
     v.append(b);
@@ -1290,6 +1348,7 @@ function showCiel(sel){
   });
   if(cur > 0) d.append(ch);
   const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
+  boutonPlume(d);
   back.style.marginTop = cur > 0 ? '0' : '26px';
   d.append(back); boutonNouveautes(d);
   view.append(d);
@@ -1308,7 +1367,8 @@ function showPage(p, opt){
   opt = opt || {};
   screen();
   const art = el('article', 'page');
-  const label = p.kind === 'fin' ? 'Dernière page' : 'Page';
+  if(p.kind === 'elle') return showPageElle(p, opt);
+  const label = p.kind === 'fin' ? 'Dernière page' : p.kind === 'bascule' ? 'Nouvelle page' : 'Page';
   art.innerHTML = '<h1 class="num" tabindex="-1" aria-label="' + label + ' ' + p.n + '"><span>' + label + '</span><b>' + roman(p.n) + '</b></h1>'
     + (p.reponse ? '<aside class="lu" aria-label="Dieu t\'a lue"><p class="who">Dieu t\'a lue</p><p>' + esc(p.reponse) + '</p></aside>' : '')
     + '<div class="stage"></div><p class="hint" aria-live="polite"></p><button class="alt" type="button"></button>'
@@ -1316,8 +1376,11 @@ function showPage(p, opt){
     + '<section class="reading" hidden tabindex="-1"></section><section class="toi" aria-labelledby="toi-t" hidden></section><nav class="after" aria-label="Pages" hidden></nav>';
   const stage = art.querySelector('.stage'), hint = art.querySelector('.hint'), alt = art.querySelector('.alt'),
         reading = art.querySelector('.reading'), after = art.querySelector('.after');
-  const full = p.kind === 'fin' ? '' : citText(p.citation);
-  if(p.kind === 'fin'){
+  const full = p.kind === 'fin' || p.kind === 'bascule' ? '' : citText(p.citation);
+  if(p.kind === 'bascule'){
+    reading.innerHTML = '<div class="mot final"><p>' + esc(p.texte) + '</p><p class="sig">Dieu</p></div>'
+      + '<p class="last">Le grimoire est à nous deux, maintenant.</p>';
+  } else if(p.kind === 'fin'){
     reading.innerHTML = '<div class="mot final">' + (p.texte ? '<p>' + esc(p.texte) + '</p>' : '') + '<p class="sig">Dieu</p></div>'
       + '<p class="last">Demain, le conte cesse d\'être un conte.</p>';
   } else {
@@ -1355,7 +1418,9 @@ function showPage(p, opt){
           b.type = 'button'; b.onclick = film ? () => { reveilSon(); voirMythe(ci); } : () => { location.hash = 'ciel'; }; reading.after(b);
           etoileDebloquee(lit);
         }
-        buildToi(p, art.querySelector('.toi')); inviteRappel(art); inviteInstall(art);
+        if(p.kind === 'bascule') boutonPlume(reading, null, true);
+        else { buildToi(p, art.querySelector('.toi')); boutonPlume(art.querySelector('.toi'), null, false, true); }
+        inviteRappel(art); inviteInstall(art);
       }, RM ? 0 : 1800);
       later(() => { reading.scrollIntoView({behavior:RM ? 'auto' : 'smooth', block:'start'}); focusSoft(reading); }, RM ? 0 : 380);
     }
@@ -1363,7 +1428,7 @@ function showPage(p, opt){
   alt.onclick = () => { if(c.onAlt) c.onAlt(); };
   view.append(art);
 
-  const g = p.kind === 'fin' ? 'fin' : (T.geste ? GESTES[(T.geste - 1) % GESTES.length] : GESTES[(p.n - 1) % GESTES.length]);
+  const g = p.kind === 'fin' ? 'fin' : p.kind === 'bascule' ? 'masque' : (T.geste ? GESTES[(T.geste - 1) % GESTES.length] : GESTES[p.g % GESTES.length]);
   const track = chooseTrack(p, g);
   // iPhone : si la musique n'a pas pu démarrer seule, le premier toucher la relance
   art.addEventListener('pointerdown', () => {
@@ -1376,7 +1441,9 @@ function showPage(p, opt){
     // Page déjà lue : on l'affiche directement
     stage.hidden = true; alt.hidden = true; hint.hidden = true;
     reading.hidden = false; reading.classList.add('show', 'nofade'); after.hidden = false;
-    buildToi(p, art.querySelector('.toi')); inviteRappel(art);
+    if(p.kind === 'bascule') boutonPlume(reading, null, true);
+    else { buildToi(p, art.querySelector('.toi')); boutonPlume(art.querySelector('.toi'), null, false, true); }
+    inviteRappel(art);
     const r = el('button', 'lbtn', 'Rejouer le geste'); r.type = 'button'; r.onclick = () => showPage(p, Object.assign({}, opt, {replay:true}));
     after.append(r);
     if(opt.from === 'som') focusSoft(art.querySelector('h1'));
@@ -1880,6 +1947,119 @@ G.fin = { hint:'Regarde…', alt:'Tout afficher',
   }
 };
 
+/* Le soir de la rencontre : le masque de Dieu tombe */
+const MASQUE = '<svg viewBox="0 0 200 120" aria-hidden="true"><defs><linearGradient id="mq" x1="0" x2="1"><stop offset="0" stop-color="#8a6a32"/><stop offset=".5" stop-color="#f1d58e"/><stop offset="1" stop-color="#8a6a32"/></linearGradient></defs>'
+  + '<path d="M8 30C40 6 160 6 192 30c6 34-14 70-48 72-18 1-30-14-44-14S74 103 56 102C22 100 2 64 8 30z" fill="url(#mq)" stroke="#5a3f16" stroke-width="2"/>'
+  + '<path d="M40 46c10-12 34-12 44 0-10 12-34 12-44 0zM116 46c10-12 34-12 44 0-10 12-34 12-44 0z" fill="#0a0a0a"/>'
+  + '<path d="M100 18v20M30 28c8 4 20 6 30 4M170 28c-8 4-20 6-30 4" stroke="#7a5a24" stroke-width="2" fill="none" stroke-linecap="round"/>'
+  + '<path d="M192 30c4 2 6 6 6 10" stroke="#8b0000" stroke-width="3" fill="none"/></svg>';
+G.masque = { hint:'Le masque de Dieu. Touche-le pour le faire tomber.', alt:'Retirer le masque',
+  mount(c){
+    c.stage.classList.add('masque-s', 'tall');
+    c.stage.innerHTML = MASQUE + '<div class="visage">C\'était moi.</div>';
+    let fin = false;
+    const end = () => { if(fin) return; fin = true; c.stage.classList.add('tombe'); Snd.play('bloom'); buzz([30, 50, 30]); Music.swell();
+      c.later(() => c.reveal(), RM ? 0 : 2200); };
+    c.stage.onclick = end; c.onAlt = end;
+    if(RM) end();
+  }
+};
+
+/* =========================================================
+   SAISON À DEUX : ses pages à elle
+   ========================================================= */
+// Une page compte comme une étoile : celles de Dieu une fois lues, les siennes dès qu'elle les écrit
+function estLue(p){ return p.kind === 'elle' || isRead(p.date); }
+function pagesElle(){
+  const m = new Map();
+  (Array.isArray(S.elleRows) ? S.elleRows : []).forEach(r => { if(r.id) m.set(r.id, r); });
+  (Array.isArray(S.miennes) ? S.miennes : []).forEach(r => { if(r.id && !m.has(r.id)) m.set(r.id, r); });
+  return Array.from(m.values()).filter(r => r.date && r.citation);
+}
+async function fetchElle(){
+  if(!URL_ELLE_CSV || T.test) return null;
+  const r = await fetch(URL_ELLE_CSV + (URL_ELLE_CSV.includes('?') ? '&' : '?') + '_=' + Date.now(), {cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer'});
+  if(!r.ok) throw new Error('http');
+  const t = await r.text(); if(/^\s*</.test(t)) throw new Error('html');
+  const all = parseCSV(t).filter(x => x.some(v => v.trim() !== '')); if(!all.length) return [];
+  const head = all.shift().map(norm), at = k => head.indexOf(k);
+  const get = (x, k) => at(k) >= 0 && x[at(k)] != null ? String(x[at(k)]).trim() : '';
+  return all.map(x => ({id:get(x, 'id'), date:parseDate(get(x, 'date')), citation:get(x, 'citation'), auteur:get(x, 'auteur'),
+    oeuvre:get(x, 'oeuvre'), mot:get(x, 'mot'), question:get(x, 'question'), t:get(x, 'id')})).filter(x => x.id && x.date && x.citation);
+}
+// Envoi discret au formulaire (sans quitter la page). Réessayé à chaque visite tant que ça n'est pas parti.
+async function envoyerElle(r){
+  if(!FORM_ELLE.action || T.test) return false;
+  const f = new URLSearchParams(), ch = FORM_ELLE.champs;
+  ['id', 'date', 'citation', 'auteur', 'oeuvre', 'mot', 'question'].forEach(k => { if(ch[k]) f.append(ch[k], r[k] || ''); });
+  try{ await fetch(FORM_ELLE.action, {method:'POST', mode:'no-cors', body:f}); r.envoye = true; saveS(); return true; }
+  catch(e){ return false; }
+}
+function envoyerEnAttente(){ (Array.isArray(S.miennes) ? S.miennes : []).filter(r => !r.envoye).forEach(envoyerElle); }
+function pageElleDuJour(){ return pagesElle().find(r => r.date === ST.today); }
+function ouvrirPageElle(id){ const p = ST.list.find(x => x.kind === 'elle' && x.id === id); if(p){ location.hash = 'page-' + p.n; return true; } return false; }
+// Le bouton « Écrire ma page », là où il a du sens (rien avant le soir de la rencontre)
+function boutonPlume(where, before, grand, sousCarnet){
+  if(!ST.s2 || !where) return;
+  const deja = pageElleDuJour();
+  const b = el('button', 'plume-btn', deja ? '✒ Relire ta page du jour' : grand ? '✒ Prendre la plume' : '✒ Écrire ma page');
+  b.type = 'button';
+  b.onclick = () => { if(deja && ouvrirPageElle(deja.id)) return; location.hash = 'ecrire'; };
+  if(sousCarnet){ b.style.marginTop = '22px'; where.after(b); }
+  else if(before) before.after(b); else where.append(b);
+}
+function showEcrire(){
+  const deja = pageElleDuJour();
+  if(deja){ const p = ST.list.find(x => x.kind === 'elle' && x.id === deja.id); if(p) return showPage(p, {from:'som'}); }
+  screen(); music(nuitTrack(), 'nuit');
+  const d = el('section', 'ecrire');
+  d.innerHTML = '<h1 tabindex="-1">Ta page</h1><p class="sub">Une page par jour, à l\'encre rouge. Elle s\'inscrit dans le grimoire et allume une étoile rouge dans notre ciel.</p>'
+    + '<div class="champ"><label for="e-cit">Une phrase qui te ressemble aujourd\'hui <small>(une réplique, des paroles, un vers…)</small></label><textarea id="e-cit" maxlength="600" placeholder="« … »"></textarea></div>'
+    + '<div class="duo champ"><div><label for="e-aut">De qui ? <small>(facultatif)</small></label><input id="e-aut" maxlength="80" autocomplete="off"></div>'
+    + '<div><label for="e-oeu">D\'où ? <small>(facultatif)</small></label><input id="e-oeu" maxlength="80" autocomplete="off"></div></div>'
+    + '<div class="champ"><label for="e-mot">Ton mot à toi <small>(facultatif)</small></label><textarea id="e-mot" maxlength="800" placeholder="Pourquoi cette phrase, pourquoi aujourd\'hui…"></textarea></div>'
+    + '<div class="champ"><label for="e-q">Une question pour Dieu <small>(facultatif)</small></label><input id="e-q" maxlength="200" autocomplete="off" placeholder="Il te répondra dans sa prochaine page."></div>'
+    + '<p class="err" role="alert"></p>';
+  const go = el('button', 'plume-btn', '✒ Inscrire ma page dans le grimoire'); go.type = 'button';
+  const back = el('button', 'lbtn', 'Plus tard'); back.type = 'button'; back.style.marginTop = '14px'; back.onclick = () => { location.hash = ''; };
+  d.append(go, back);
+  view.append(d);
+  const v = id => d.querySelector(id).value.trim();
+  go.onclick = () => {
+    const citation = v('#e-cit');
+    if(!citation){ d.querySelector('.err').textContent = 'Il manque ta phrase.'; d.querySelector('#e-cit').focus(); return; }
+    const now = clock(), id = iso(now).replace(/-/g, '') + '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+    const r = {id, t:id, date:iso(now), citation, auteur:v('#e-aut'), oeuvre:v('#e-oeu'), mot:v('#e-mot'), question:v('#e-q'), envoye:false};
+    if(!Array.isArray(S.miennes)) S.miennes = [];
+    S.miennes.push(r); S.neuveElle = id; saveS(); envoyerElle(r);
+    build(S.rows || [], ST.ok);
+    if(!ouvrirPageElle(id)) location.hash = '';
+  };
+  focusSoft(d.querySelector('h1'));
+}
+function showPageElle(p, opt){
+  screen(); music(pisteDuSoir(), 'plein');
+  const art = el('article', 'page elle');
+  const src = p.auteur ? '<p class="src">— ' + esc(p.auteur) + (p.oeuvre ? ', <i>' + esc(p.oeuvre) + '</i>' : '') + '</p>' : (p.oeuvre ? '<p class="src"><i>' + esc(p.oeuvre) + '</i></p>' : '');
+  art.innerHTML = '<h1 class="num" tabindex="-1" aria-label="Ta page, ' + esc(fmtLong(p.date)) + '"><span>Page de la ' + esc(SIGNATURE_ELLE.toLowerCase()) + '</span><b>' + roman(p.n) + '</b></h1>'
+    + '<section class="reading show"><blockquote class="cit">' + esc(citText(p.citation)) + '</blockquote>' + src
+    + (p.mot ? '<div class="mot elle"><p>' + esc(p.mot) + '</p><p class="sig">' + esc(SIGNATURE_ELLE) + '</p></div>' : '')
+    + (p.question ? '<p class="question-elle"><small>Ta question pour Dieu</small>' + esc(p.question) + '</p>' : '')
+    + '</section><nav class="after" aria-label="Pages"></nav>';
+  const after = art.querySelector('.after');
+  const idx = ST.list.indexOf(p), prev = ST.list[idx - 1], next = ST.list[idx + 1];
+  const nb = (txt, aria, fn) => { const b = el('button', 'lbtn', txt); b.type = 'button'; if(aria) b.setAttribute('aria-label', aria); b.onclick = fn; after.append(b); };
+  if(prev) nb('‹ ' + roman(prev.n), 'Page précédente, ' + prev.n, () => { location.hash = 'page-' + prev.n; });
+  nb('Feuilleter le grimoire', null, () => { location.hash = 'sommaire'; });
+  if(next) nb(roman(next.n) + ' ›', 'Page suivante, ' + next.n, () => { location.hash = 'page-' + next.n; });
+  view.append(art);
+  focusSoft(art.querySelector('h1'));
+  if(S.neuveElle === p.id){
+    delete S.neuveElle; saveS();
+    later(() => etoileDebloquee(etoilesLues().length, true), RM ? 0 : 900);
+  }
+}
+
 /* =========================================================
    DÉMARRAGE
    ========================================================= */
@@ -1925,6 +2105,8 @@ document.addEventListener('visibilitychange', () => {
     cacheDepuis = 0; nouvellePiste(); showIntro();
   }
 });
+// Saison à deux active (soir de la rencontre à partir de 21 h, puis tous les jours suivants)
+function saisonDeux(){ const d = iso(clock()); return !!RENCONTRE && (d > RENCONTRE || (d === RENCONTRE && unlocked())); }
 function showIntro(){
   introOn = true;
   music(null);
@@ -1947,7 +2129,7 @@ function showIntro(){
     if(w){
       const v = w.querySelector('video'), pos = v.currentTime || 0, t = pisteDuSoir(); try{ v.pause(); }catch(e){} w.remove();
       // La vidéo place l'envolée de la chanson à 26 s : le grimoire reprend la chanson au même endroit
-      if(t && pos > 1) Music.suite = {track:t, at:Math.max(0, t.envol - 26) + pos};
+      if(t && pos > 1) Music.suite = {track:t, at:Math.max(0, t.envol - 26) + pos + (w.dataset.decal ? +w.dataset.decal : 0)};
     }
     boot();
   };
@@ -1955,11 +2137,19 @@ function showIntro(){
   go.onclick = () => {
     if(d.classList.contains('ouvre')) return;
     reveilSon();   // la musique suivra dans le grimoire (sauf si elle a coupé le son)
-    const src = 'intro-' + (pisteDuSoir() || MUSIQUES[0]).fichier.replace(/\.mp3$/, '') + '.mp4?v=2';
+    const slug = (pisteDuSoir() || MUSIQUES[0]).fichier.replace(/\.mp3$/, '');
+    // Saison à deux : intro « Deux plumes » en entier à la 1re visite de la soirée, puis sa fin seule (5 s, à partir de 24,6 s)
+    const s2 = saisonDeux(), soir = iso(new Date(clock().getTime() - 6 * 3600 * 1000));
+    const court = s2 && S.intro2 === soir;
+    if(s2 && !court){ S.intro2 = soir; saveS(); }
+    const src = s2 ? (court ? 'intro2c-' : 'intro2-') + slug + '.mp4?v=1' : 'intro-' + slug + '.mp4?v=2';
     const w = el('div', 'intro-v');
+    if(court) w.dataset.decal = '24.6';
     w.innerHTML = '<video playsinline preload="auto" src="' + src + '" aria-describedby="intro-txt"></video>'
       + '<button class="intro-skip" type="button">Passer</button>'
-      + '<p id="intro-txt" class="sr-only">L’œil d’une chouette s’ouvre, la pleine lune dans la pupille. La nuit, quelqu’un veille. Ses serres tiennent une page scellée de cire rouge : il t’a écrit une page. La chouette passe devant la lune, au-dessus d’un temple grec, puis traverse une ville endormie pour toi. Elle se pose à une fenêtre éclairée et y dépose la page. Ta page t’attend. Signé Dieu.</p>';
+      + (s2
+        ? '<p id="intro-txt" class="sr-only">' + (court ? '' : 'La chouette dépose la page sur un bureau, près d’un encrier où attendent deux plumes, une d’or et une rouge. Il y a deux plumes, maintenant. La plume d’or écrit : il a écrit pour toi chaque nuit. La plume rouge écrit à côté : ce soir, tu écris avec lui. Les encres s’envolent par la fenêtre. ') + 'Dans le ciel, des étoiles d’or et rouges forment une constellation. Notre ciel s’écrit à deux. Signé Dieu.</p>'
+        : '<p id="intro-txt" class="sr-only">L’œil d’une chouette s’ouvre, la pleine lune dans la pupille. La nuit, quelqu’un veille. Ses serres tiennent une page scellée de cire rouge : il t’a écrit une page. La chouette passe devant la lune, au-dessus d’un temple grec, puis traverse une ville endormie pour toi. Elle se pose à une fenêtre éclairée et y dépose la page. Ta page t’attend. Signé Dieu.</p>');
     const v = w.querySelector('video');
     v.muted = !Snd.on;   // si elle a coupé le son, la vidéo reste muette aussi
     // iPhone : la vidéo de la chouette doit être lancée pendant le toucher pour garder le son ; on l'arrête aussitôt
