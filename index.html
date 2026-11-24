@@ -679,6 +679,57 @@ body:not(.a-ce-soir) .jx{display:none}
 html.rm .porte.neuf::after{animation:none}
 .attente-soir .lbtn{margin-top:6px}
 .lien-retour{display:block;margin:14px auto 0;min-height:44px;padding:0 16px;border:0;background:none;font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--muted);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+
+/* Idées du 24/11 : chat qui réagit, bougies, cartes de secrets, réactions */
+.chat-btn{position:relative;display:block;margin:0 auto;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.chat-btn .chat-v{width:min(230px,62vw);height:auto;aspect-ratio:1;object-fit:cover;filter:none;
+  -webkit-mask-image:radial-gradient(circle at 50% 52%,#000 52%,transparent 71%);mask-image:radial-gradient(circle at 50% 52%,#000 52%,transparent 71%)}
+.chat-btn.eveil .chat-v{animation:none}
+.hub .chat-btn .bulle,.attente-soir .chat-btn .bulle{top:8px}
+.chat-btn .art .yo{opacity:0;transition:opacity .2s}
+.chat-btn.eveil .art .yo{opacity:1}
+.chat-btn.eveil .art .yf,.chat-btn.eveil .art .zz{opacity:0}
+.chat-btn.eveil .art{animation:etire .9s ease}
+@keyframes etire{30%{transform:scale(1.04,.97)}60%{transform:scale(.98,1.03)}}
+.chat-btn .bulle{position:absolute;left:50%;top:-6px;transform:translateX(-10%);white-space:nowrap;font-style:italic;font-size:1.05rem;color:var(--gold-pale);
+  opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+.chat-btn.eveil .bulle{opacity:1;transform:translate(-10%,-8px)}
+.jx{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px 0 6px}
+.bougies{display:inline-flex;gap:7px;align-items:flex-end}
+.bg{width:12px;height:26px;overflow:visible}
+.bg.on{filter:drop-shadow(0 0 5px rgba(255,190,90,.7))}
+.bg .fl{transform-origin:7px 11px;animation:flamme 1.8s ease-in-out infinite}
+.bg:nth-child(2) .fl{animation-delay:-.4s}.bg:nth-child(3) .fl{animation-delay:-.9s}.bg:nth-child(4) .fl{animation-delay:-1.3s}
+@keyframes flamme{50%{transform:scale(.9,1.08) skewX(3deg)}}
+.jxl{font-style:italic;font-size:1rem;color:var(--red-text)}
+html.rm .bg .fl{animation:none}
+.secrets-vus{max-width:none;margin:34px 0 0;text-align:center}
+.secrets-vus h2{margin:0;font-weight:500;font-style:italic;font-size:1.7rem;color:var(--gold)}
+.secrets-vus .sub{margin:2px 0 16px;font-style:italic;color:var(--muted)}
+.cartes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:left}
+.cs{position:relative;display:grid;perspective:900px}
+.cs:not(.ouverte) .dos{position:absolute;inset:0;overflow:hidden}
+.cs.ouverte{grid-column:1 / -1}
+.cs .face{grid-area:1 / 1;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .6s cubic-bezier(.3,.7,.3,1);border-radius:8px}
+.cs .avant{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:120px;border:1px solid var(--hair);
+  background:repeating-linear-gradient(45deg,rgba(201,169,110,.05) 0 2px,transparent 2px 9px),linear-gradient(170deg,#1a120b,#0b0806);color:var(--gold);cursor:pointer;font-family:var(--serif)}
+.cs .avant svg{width:30px;height:30px}
+.cs .avant span{font-style:italic;font-size:1.1rem;color:var(--gold-pale)}
+.cs .avant i{position:absolute;top:8px;right:10px;font-style:normal;font-size:1rem}
+.cs .dos{transform:rotateY(180deg);padding:18px 18px 12px;background:linear-gradient(#f7efe0,#eadfc8);color:#2a1c12;cursor:pointer}
+.cs .dos p{margin:0;font-style:italic;font-size:1.15rem;line-height:1.45}
+.cs .dos .sig{margin-top:8px;text-align:right;font-size:.98rem;font-weight:600;color:#8b0016}
+.cs.ouverte .avant{transform:rotateY(-180deg)}
+.cs.ouverte .dos{transform:rotateY(0)}
+.cs:not(.ouverte) .dos{visibility:hidden;transition:transform .6s,visibility 0s .3s}
+html.rm .cs .face{transition:none}
+.reac{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:12px 0 2px}
+.reac button{min-width:48px;min-height:48px;border-radius:999px;border:1px solid rgba(139,0,22,.25);background:rgba(255,255,255,.35);font-size:1.35rem;cursor:pointer;line-height:1}
+.secret .reac button{border-color:var(--hair);background:rgba(201,169,110,.06)}
+.reac button[aria-pressed="true"]{border-color:#b3001b;background:rgba(179,0,27,.16);box-shadow:0 0 12px rgba(179,0,27,.3)}
+.reac button.pop{animation:pop .45s ease}
+@keyframes pop{40%{transform:scale(1.3)}}
+html.rm .reac button.pop{animation:none}
 </style>
 </head>
 <body>
@@ -1192,8 +1243,24 @@ function build(rows, ok){
   $('#bSom').hidden = !vis.length; $('#bCiel').hidden = !vis.length;
   $('#bSec').hidden = !Object.keys(SECRETS).some(d => d <= today && SECRETS[d].secret);
   const jx = $('#jx');
-  if(RENCONTRE){ const x = daysBetween(today, RENCONTRE); jx.hidden = x < 1; jx.textContent = 'J-' + x + ' avant la visite divine'; }
+  if(RENCONTRE){ const x = daysBetween(today, RENCONTRE); jx.hidden = x < 1; bougies(jx, x); }
   else jx.hidden = true;
+}
+
+/* Idée 2 : cinq bougies jusqu'à la visite divine, une s'éteint chaque jour */
+function bougies(jx, x){
+  const N = 5, allumees = Math.max(0, Math.min(N, x));
+  let h = '';
+  for(let i = 0; i < N; i++){
+    const on = i < allumees;
+    h += '<svg class="bg' + (on ? ' on' : '') + '" viewBox="0 0 14 30" aria-hidden="true">'
+      + (on ? '<path class="fl" d="M7 1C9.6 5 9.8 8 7 11 4.2 8 4.4 5 7 1z" fill="#ffc35a"/><path d="M7 5.5c1 1.6 1 2.8 0 4-1-1.2-1-2.4 0-4z" fill="#fff6dc"/>'
+        : '<path class="fumee" d="M7 10c-2-2 2-3 0-5s1-3 0-4" fill="none" stroke="rgba(242,235,224,.35)" stroke-width=".8"/>')
+      + '<path d="M7 11v2.5" stroke="#2a2a2a" stroke-width="1"/><rect x="3.5" y="13" width="7" height="16" rx="1.2" fill="' + (on ? '#efe3cb' : '#7d7466') + '"/></svg>';
+  }
+  jx.innerHTML = '<span class="bougies">' + h + '</span><span class="jxl">J-' + x + '</span>';
+  jx.setAttribute('aria-label', 'J-' + x + ' avant la visite divine');
+  jx.setAttribute('role', 'img');
 }
 
 let booting = null;
@@ -1330,7 +1397,8 @@ const CAT_SLEEP = '<svg class="art" viewBox="0 0 160 124" aria-hidden="true">'
   + '<rect x="18" y="84" width="124" height="26" rx="3" fill="#3d0d19" stroke="#c9a96e" stroke-width=".8"/><path d="M24 92h112M24 100h112" stroke="rgba(201,169,110,.35)"/>'
   + '<g transform="translate(48 22)"><path d="M44 57c9 0 14-5 13-12-1-5-6-6-7-2" fill="none" stroke="#141414" stroke-width="4" stroke-linecap="round"/>'
   + '<path d="M19 62c-3-11 0-22 9-26h8c9 4 12 15 9 26z" fill="#141414"/><path d="M22 13l2 10h16l2-10-7 5h-6z" fill="#141414"/><circle cx="32" cy="25" r="10" fill="#141414"/>'
-  + '<path d="M26 26q2 1.6 4 0M34 26q2 1.6 4 0" stroke="#d8cc5c" stroke-width="1" fill="none" stroke-linecap="round"/></g>'
+  + '<path class="yf" d="M26 26q2 1.6 4 0M34 26q2 1.6 4 0" stroke="#d8cc5c" stroke-width="1" fill="none" stroke-linecap="round"/>'
+  + '<g class="yo"><ellipse cx="28" cy="25.6" rx="2.2" ry="2.6" fill="#d8cc5c"/><ellipse cx="36" cy="25.6" rx="2.2" ry="2.6" fill="#d8cc5c"/><ellipse cx="28.3" cy="25.6" rx=".7" ry="2" fill="#0a0a0a"/><ellipse cx="36.3" cy="25.6" rx=".7" ry="2" fill="#0a0a0a"/></g></g>'
   + '<g class="zz" fill="#c9a96e" font-family="Cormorant Garamond,serif" font-style="italic"><text x="98" y="30" font-size="14">z</text><text x="108" y="18" font-size="10">z</text></g></svg>';
 const INK = '<svg class="art" viewBox="0 0 160 124" aria-hidden="true">'
   + '<path d="M54 112h52l-6-34H60z" fill="#141414" stroke="#c9a96e" stroke-width=".8"/><rect x="66" y="66" width="28" height="12" rx="2" fill="#141414" stroke="#c9a96e" stroke-width=".8"/>'
@@ -1417,6 +1485,7 @@ function jeuDuJour(where){
     const s = el('div', 'secret');
     s.innerHTML = '<div class="mot"><p>' + esc(j.secret) + '</p><p class="sig">Dieu</p></div>';
     if(!anim) s.querySelector('.mot').style.animation = 'none';
+    s.append(reactions(ST.today));
     box.append(s);
     if(anim){ announce('Secret débloqué : ' + j.secret); later(() => s.scrollIntoView({behavior:RM ? 'auto' : 'smooth', block:'center'}), 300); }
   };
@@ -1488,12 +1557,32 @@ function jeuDuJour(where){
 }
 // Les secrets déjà découverts les jours précédents
 function secretsVus(where){
-  const vus = Object.keys(S.secrets || {}).filter(d => d < ST.today && SECRETS[d] && SECRETS[d].secret).sort();
+  const vus = Object.keys(S.secrets || {}).filter(d => d < ST.today && SECRETS[d] && SECRETS[d].secret).sort().reverse();
   if(!vus.length) return;
-  const det = el('details', 'secrets-vus');
-  det.innerHTML = '<summary>Les secrets que tu connais déjà (' + vus.length + ')</summary><ol>'
-    + vus.map(d => '<li>' + esc(SECRETS[d].secret) + '<small>' + esc(fmtLong(d)) + '</small></li>').join('') + '</ol>';
-  where.append(det);
+  const w = el('section', 'secrets-vus'); w.setAttribute('aria-label', 'Tes secrets');
+  w.innerHTML = '<h2>Ta collection</h2><p class="sub">Touche une carte pour la retourner.</p>';
+  const grille = el('div', 'cartes');
+  vus.forEach(d => {
+    const c = el('div', 'cs');
+    c.innerHTML = '<button class="face avant" type="button" aria-expanded="false" aria-label="Secret du ' + esc(fmtLong(d)) + ', retourner la carte">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3.5M21 12v2.5"/></svg>'
+      + '<span>' + esc(fmtDay(d)) + '</span>' + ((S.reac || {})[d] ? '<i aria-hidden="true">' + S.reac[d].emoji + '</i>' : '') + '</button>'
+      + '<div class="face dos"><p>' + esc(SECRETS[d].secret) + '</p><p class="sig">Dieu, le ' + esc(fmtLong(d)) + '</p></div>';
+    const av = c.querySelector('.avant'), dos = c.querySelector('.dos');
+    dos.append(reactions(d));
+    dos.setAttribute('aria-hidden', 'true');
+    const tourne = ouvre => {
+      c.classList.toggle('ouverte', ouvre); av.setAttribute('aria-expanded', String(ouvre));
+      dos.setAttribute('aria-hidden', String(!ouvre)); av.tabIndex = ouvre ? -1 : 0;
+      buzz(8);
+      if(ouvre) later(() => c.scrollIntoView({behavior:RM ? 'auto' : 'smooth', block:'nearest'}), 380);
+    };
+    av.onclick = () => tourne(true);
+    dos.onclick = e => { if(!e.target.closest('.reac')){ tourne(false); av.focus(); } };
+    grille.append(c);
+  });
+  w.append(grille);
+  where.append(w);
 }
 // Les secrets, à toute heure (bouton clé de l'en-tête) : le jeu du jour s'il n'est pas fini, puis tous les secrets connus
 function showSecrets(){
@@ -1513,6 +1602,79 @@ function showSecrets(){
 }
 
 /* ---------- Écrans d'attente ---------- */
+/* Idée 1 (24/11) : le chat endormi réagit quand elle le touche (yeux ouverts, ronron, petite bulle) */
+const CHAT_VIDEO = 'chat.mp4?v=1', CHAT_POSTER = 'chat.jpg?v=1';   // vides = le dessin
+const RONRONS = ['Mrrr…', 'Prrrt ?', 'Encore cinq minutes…', 'Mrrrou.', 'Zzz… quoi ?'];
+function ronron(){
+  if(!Snd.on || !Snd.init()) return;
+  try{
+    const c = Snd.ctx; c.resume(); const t = c.currentTime + .02;
+    const n = Snd.noise(1.5), lp = Snd.filt('lowpass', 320), am = c.createGain(), g = c.createGain(), lfo = Snd.osc(24, 'sine'), lg = c.createGain();
+    am.gain.value = .5; lg.gain.value = .5; lfo.connect(lg); lg.connect(am.gain);
+    n.connect(lp); lp.connect(am); am.connect(g); g.connect(Snd.m);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.55, t + .25); g.gain.exponentialRampToValueAtTime(.0001, t + 1.45);
+    n.start(t); lfo.start(t); n.stop(t + 1.5); lfo.stop(t + 1.5);
+  }catch(e){}
+}
+function chatTouchable(where){
+  const art = where.querySelector('.art'); if(!art) return;
+  const b = el('button', 'chat-btn'); b.type = 'button'; b.setAttribute('aria-label', 'Caresser le chat');
+  art.replaceWith(b); b.append(art);
+  const bulle = el('span', 'bulle'); bulle.setAttribute('aria-live', 'polite'); b.append(bulle);
+  // Le chat peint (HeyGen) : endormi au repos, il se réveille quand elle le touche. Le dessin reste en secours.
+  let v = null;
+  if(CHAT_VIDEO){
+    v = document.createElement('video'); v.className = 'art chat-v'; v.src = CHAT_VIDEO; v.poster = CHAT_POSTER;
+    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.setAttribute('aria-hidden', 'true');
+    v.onerror = () => { if(v.parentNode) v.replaceWith(art); v = null; };
+    v.onended = () => { try{ v.currentTime = 0; }catch(e){} };
+    art.replaceWith(v);
+  }
+  let n = 0, tm = 0;
+  b.onclick = () => {
+    clearTimeout(tm); b.classList.remove('eveil'); void b.offsetWidth; b.classList.add('eveil');
+    bulle.textContent = RONRONS[n++ % RONRONS.length];
+    buzz([12, 40, 12]);
+    if(v && v.parentNode){
+      try{ v.muted = !Snd.on; v.currentTime = 0; const pr = v.play(); if(pr) pr.catch(() => { v.muted = true; v.play().catch(() => {}); }); }catch(e){}
+    } else ronron();
+    tm = setTimeout(() => { b.classList.remove('eveil'); bulle.textContent = ''; }, v && v.parentNode ? 4200 : 1900);
+  };
+}
+/* Idée 3 : un salut qui change avec l'heure */
+function salut(){
+  const h = clock().getHours();
+  return h < 5 ? 'Tu devrais dormir, princesse.' : h < 12 ? 'Bonjour, princesse.' : h < 18 ? 'Bel après-midi, princesse.' : 'Bientôt ' + HEURE_DEBLOCAGE + ' h, princesse.';
+}
+/* Idée 5 : réagir à un secret. Part discrètement dans le Form de ses pages (id « reaction-… », sans citation :
+   ça n'apparaît pas comme une page, mais Dieu le voit dans le Sheet). Une réaction par secret, modifiable. */
+const REACTIONS = ['❤️', '😮', '😂', '🥺'];
+function envoyerReaction(r){
+  if(!FORM_ELLE.action || T.test) return;
+  const f = new URLSearchParams(), ch = FORM_ELLE.champs;
+  f.append(ch.id, 'reaction-' + r.date); f.append(ch.date, r.date);
+  f.append(ch.mot, r.emoji + ' au secret du ' + fmtLong(r.date) + ' : « ' + ((SECRETS[r.date] || {}).secret || '').slice(0, 80) + '… »');
+  fetch(FORM_ELLE.action, {method:'POST', mode:'no-cors', body:f}).then(() => { r.envoye = true; saveS(); }).catch(() => {});
+}
+function reactions(date){
+  S.reac = S.reac || {};
+  const box = el('div', 'reac'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Ta réaction à ce secret');
+  const maj = () => box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String((S.reac[date] || {}).emoji === b.textContent)));
+  REACTIONS.forEach(e => {
+    const b = el('button', '', e); b.type = 'button';
+    b.onclick = ev => {
+      ev.stopPropagation();
+      if((S.reac[date] || {}).emoji === e) return;
+      const r = S.reac[date] = {date, emoji:e, envoye:false}; saveS(); maj(); buzz(10);
+      b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+      announce('Réaction envoyée à Dieu.'); envoyerReaction(r);
+    };
+    box.append(b);
+  });
+  maj();
+  return box;
+}
+
 // Compte à rebours jusqu'à 21 h, écrit dans `out` ; court = sans les secondes. À 21 h, le grimoire se réveille.
 function rebours(out, court){
   const tick = () => {
@@ -1533,7 +1695,7 @@ function jeuValide(j){ return !!(j && j.secret && !(j.jeu === 'mensonge' && (!j.
 function showSleep(){
   screen(); music(nuitTrack(), 'nuit');
   const d = el('section', 'screen hub');
-  d.innerHTML = CAT_SLEEP + '<h1 class="msg" tabindex="-1">Le grimoire dort, princesse.</h1>';
+  d.innerHTML = CAT_SLEEP + '<h1 class="msg" tabindex="-1">' + salut() + '</h1>';
   const choix = el('div', 'choix');
   const porte = (cls, icone, titre, sous, fn) => {
     const b = el('button', 'porte ' + cls); b.type = 'button';
@@ -1550,6 +1712,7 @@ function showSleep(){
   soir.setAttribute('aria-label', 'Page du soir, à ' + HEURE_DEBLOCAGE + ' heures');
   d.append(choix);
   boutonPlume(d);
+  chatTouchable(d);
   view.append(d);
   rebours(soir.querySelector('.cdm'), true);
   focusSoft(d.querySelector('h1'));
@@ -1565,6 +1728,7 @@ function showAttente(){
   if(der){ const b = el('button', 'lbtn', 'Relire la page ' + roman(der.n)); b.type = 'button'; b.onclick = () => { location.hash = 'page-' + der.n; }; d.append(b); }
   const back = el('button', 'lien-retour', 'Revenir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
   d.append(back);
+  chatTouchable(d);
   view.append(d);
   rebours(d.querySelector('.cd b'));
   focusSoft(d.querySelector('h1'));
@@ -2388,7 +2552,7 @@ async function envoyerElle(r){
   try{ await fetch(FORM_ELLE.action, {method:'POST', mode:'no-cors', body:f}); r.envoye = true; saveS(); return true; }
   catch(e){ return false; }
 }
-function envoyerEnAttente(){ (Array.isArray(S.miennes) ? S.miennes : []).filter(r => !r.envoye).forEach(envoyerElle); }
+function envoyerEnAttente(){ (Array.isArray(S.miennes) ? S.miennes : []).filter(r => !r.envoye).forEach(envoyerElle); Object.values(S.reac || {}).filter(r => r && !r.envoye).forEach(envoyerReaction); }
 function pageElleDuJour(){ return pagesElle().find(r => r.date === ST.today); }
 function ouvrirPageElle(id){ const p = ST.list.find(x => x.kind === 'elle' && x.id === id); if(p){ location.hash = 'page-' + p.n; return true; } return false; }
 // Le bouton « Écrire ma page », là où il a du sens (rien avant le soir de la rencontre)
