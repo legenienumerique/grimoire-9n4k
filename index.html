@@ -656,6 +656,29 @@ body:not(.a-ce-soir) .jx{display:none}
 .pg.grande .r{font-size:3.2rem}
 .pg.grande .etat{margin-top:6px;padding:3px 12px;border:1px solid rgba(201,169,110,.45);border-radius:999px;font-style:italic;font-size:.95rem;color:var(--gold)}
 .pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:0 0 30px}
+/* Écran de journée : deux portes, sans défilement */
+.hub{padding-top:2vh}
+.hub .art{width:150px}
+.hub .msg{margin:14px 0 22px}
+.choix{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:420px;margin:0 auto}
+.porte{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:168px;padding:18px 10px;
+  border:1px solid var(--hair);border-radius:8px;background:linear-gradient(170deg,#16110b,#0b0806 70%);color:var(--ink);cursor:pointer;
+  transition:border-color .2s,transform .15s}
+.porte:hover,.porte:focus-visible{border-color:rgba(201,169,110,.65)}
+.porte:active{transform:scale(.97)}
+.porte .ic svg{width:34px;height:34px;color:var(--gold)}
+.porte .t{font-style:italic;font-size:1.35rem;line-height:1.15;color:var(--gold-pale)}
+.porte .s{font-size:1rem;color:var(--muted)}
+.porte .s b{font-weight:600;color:var(--gold);font-variant-numeric:tabular-nums}
+.choix .porte:only-child{grid-column:1 / -1}
+/* Le secret pas encore trouvé : la seule porte qui appelle */
+.porte.neuf{border-color:rgba(179,0,27,.6);background:radial-gradient(ellipse 90% 70% at 50% 0%,rgba(179,0,27,.22),transparent 70%),linear-gradient(170deg,#1a0c0c,#0b0606 70%)}
+.porte.neuf .s{color:var(--red-text)}
+.porte.neuf::after{content:"";position:absolute;top:10px;right:10px;width:9px;height:9px;border-radius:50%;background:#e8536a;box-shadow:0 0 10px rgba(232,83,106,.9);animation:appel 2.4s ease-in-out infinite}
+@keyframes appel{50%{opacity:.35}}
+html.rm .porte.neuf::after{animation:none}
+.attente-soir .lbtn{margin-top:6px}
+.lien-retour{display:block;margin:14px auto 0;min-height:44px;padding:0 16px;border:0;background:none;font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--muted);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1208,6 +1231,7 @@ function route(){
   if(h === '#ciel' && ST.list.length) return showCiel();
   if(h === '#ecrire' && ST.s2) return showEcrire();
   if(h === '#secrets') return showSecrets();
+  if(h === '#attente') return ST.un ? tonight() : showAttente();
   const m = h.match(/^#page-(\d+)$/);
   if(m){ const p = ST.list.find(x => x.n === +m[1]); if(p) return showPage(p, {from:'som'}); }
   tonight();
@@ -1489,23 +1513,61 @@ function showSecrets(){
 }
 
 /* ---------- Écrans d'attente ---------- */
-function showSleep(){
-  screen(); music(nuitTrack(), 'nuit');
-  const d = el('section', 'screen');
-  d.innerHTML = CAT_SLEEP + '<h1 class="msg">Le grimoire dort, princesse.</h1>'
-    + '<p class="cd" role="timer" aria-live="off">Il s\'éveille dans <b aria-hidden="true"></b><span class="sr-only">quelques heures, à ' + HEURE_DEBLOCAGE + ' heures.</span></p>';
-  jeuDuJour(d);
-  boutonPlume(d);
-  view.append(d);
-  const out = d.querySelector('.cd b');
+// Compte à rebours jusqu'à 21 h, écrit dans `out` ; court = sans les secondes. À 21 h, le grimoire se réveille.
+function rebours(out, court){
   const tick = () => {
     const c = clock(), t = new Date(c); t.setHours(HEURE_DEBLOCAGE, 0, 0, 0);
     let s = Math.ceil((t - c) / 1000);
-    if(s <= 0){ out.textContent = '0 s'; intervals.forEach(clearInterval); boot(); return; }
+    if(s <= 0){ out.textContent = court ? 'maintenant' : '0 s'; intervals.forEach(clearInterval); boot(); return; }
     const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); s = s % 60;
-    out.textContent = (h ? h + ' h ' + pad(m) + ' min ' : (m ? m + ' min ' : '')) + pad(s) + ' s';
+    out.textContent = court ? (h ? h + ' h ' + pad(m) : m ? m + ' min' : 'moins d\'une minute')
+      : (h ? h + ' h ' + pad(m) + ' min ' : (m ? m + ' min ' : '')) + pad(s) + ' s';
   };
   tick(); every(tick, 1000);
+}
+// Le jeu du jour est-il jouable aujourd'hui ?
+function jeuValide(j){ return !!(j && j.secret && !(j.jeu === 'mensonge' && (!j.faux || !j.vrais || j.vrais.some(v => !v)))); }
+
+/* Refonte 24/11 : en journée, un écran de choix qui tient sans défiler.
+   Deux portes : le secret du jour (le jeu) ou la page du soir (le compte à rebours). */
+function showSleep(){
+  screen(); music(nuitTrack(), 'nuit');
+  const d = el('section', 'screen hub');
+  d.innerHTML = CAT_SLEEP + '<h1 class="msg" tabindex="-1">Le grimoire dort, princesse.</h1>';
+  const choix = el('div', 'choix');
+  const porte = (cls, icone, titre, sous, fn) => {
+    const b = el('button', 'porte ' + cls); b.type = 'button';
+    b.innerHTML = '<span class="ic" aria-hidden="true">' + icone + '</span><span class="t">' + titre + '</span><span class="s">' + sous + '</span>';
+    b.onclick = fn; choix.append(b); return b;
+  };
+  const j = SECRETS[ST.today], gagne = !!(S.secrets || {})[ST.today];
+  const vus = Object.keys(S.secrets || {}).filter(x => SECRETS[x] && SECRETS[x].secret).length;
+  const KEY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3.5M21 12v2.5"/></svg>';
+  const LUNE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></svg>';
+  if(jeuValide(j)) porte(gagne ? 'fait' : 'neuf', KEY, 'Secret du jour', gagne ? 'Trouvé. Le relire' : 'Un jeu t\'attend', () => { location.hash = 'secrets'; });
+  else if(vus) porte('fait', KEY, 'Tes secrets', vus + (vus > 1 ? ' trouvés' : ' trouvé'), () => { location.hash = 'secrets'; });
+  const soir = porte('soir', LUNE, 'Page du soir', 'Dans <b class="cdm"></b>', () => { location.hash = 'attente'; });
+  soir.setAttribute('aria-label', 'Page du soir, à ' + HEURE_DEBLOCAGE + ' heures');
+  d.append(choix);
+  boutonPlume(d);
+  view.append(d);
+  rebours(soir.querySelector('.cdm'), true);
+  focusSoft(d.querySelector('h1'));
+}
+// La page du soir, avant 21 h : le grand compte à rebours, et de quoi patienter
+function showAttente(){
+  screen(); music(nuitTrack(), 'nuit');
+  const d = el('section', 'screen attente-soir');
+  d.innerHTML = CAT_SLEEP + '<h1 class="msg" tabindex="-1">Ta page s\'écrit encore.</h1>'
+    + '<p class="cd" role="timer" aria-live="off">Elle s\'éveille dans <b aria-hidden="true"></b><span class="sr-only">quelques heures, à ' + HEURE_DEBLOCAGE + ' heures.</span></p>';
+  const lues = ST.list.filter(p => p.kind !== 'elle' && isRead(p.date));
+  const der = lues[lues.length - 1];
+  if(der){ const b = el('button', 'lbtn', 'Relire la page ' + roman(der.n)); b.type = 'button'; b.onclick = () => { location.hash = 'page-' + der.n; }; d.append(b); }
+  const back = el('button', 'lien-retour', 'Revenir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
+  d.append(back);
+  view.append(d);
+  rebours(d.querySelector('.cd b'));
+  focusSoft(d.querySelector('h1'));
 }
 function showInk(){
   screen(); music(nuitTrack(), 'nuit');
