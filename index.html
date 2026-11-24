@@ -730,6 +730,18 @@ html.rm .cs .face{transition:none}
 .reac button.pop{animation:pop .45s ease}
 @keyframes pop{40%{transform:scale(1.3)}}
 html.rm .reac button.pop{animation:none}
+
+/* Chat à états (24/11) */
+.chat-scene{position:relative;display:block;width:min(230px,62vw);aspect-ratio:1;
+  -webkit-mask-image:radial-gradient(circle at 50% 52%,#000 52%,transparent 71%);mask-image:radial-gradient(circle at 50% 52%,#000 52%,transparent 71%)}
+.chat-scene .chat-fond,.chat-scene .chat-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.chat-scene .chat-v{opacity:0;transition:opacity .45s}
+.chat-scene .chat-v.on{opacity:1}
+.chat-btn .bulle{opacity:0}
+.chat-btn.parle .bulle{opacity:1;transform:translate(-10%,-8px)}
+.chat-ouvre video{max-width:min(100vw,100vh)}
+.chat-ouvre{transition:opacity .45s}
+.chat-ouvre.sort{opacity:0}
 </style>
 </head>
 <body>
@@ -747,8 +759,6 @@ html.rm .reac button.pop{animation:none}
     <div class="menu" id="menu" hidden>
       <button class="mi" id="bSon" type="button" aria-pressed="false" aria-label="Activer le son">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="w1" d="M16 9.5c1 1.4 1 3.6 0 5"/><path class="x1" d="M16.5 9.5l4 5m0-5l-4 5"/></svg><span class="lab">Musique</span><span class="etat"></span></button>
-      <button class="mi" id="mNouv" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><span class="lab">Revoir les nouveautés</span></button>
       <button class="mi" id="mInstall" type="button" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M12 7.5v7M9 11.5l3 3 3-3"/></svg><span class="lab">Garder sur mon écran d'accueil</span></button>
     </div>
@@ -1321,7 +1331,6 @@ bMenu.addEventListener('click', e => {
 });
 document.addEventListener('click', e => { if(!menu.hidden && !menu.contains(e.target)) fermerMenu(); });
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && !menu.hidden){ fermerMenu(); bMenu.focus(); } });
-$('#mNouv').addEventListener('click', () => { fermerMenu(); reveilSon(); showNouveautes(route, true); });
 $('#mInstall').addEventListener('click', () => { fermerMenu(); location.hash = 'installer'; });
 function showInstaller(){
   screen(); music(nuitTrack(), 'nuit');
@@ -1380,7 +1389,7 @@ function boutonNouveautes(where){
 }
 
 function tonight(){
-  if(!nouvVue() && ST.today >= NOUVEAUTES.date) return showNouveautes(tonight);
+  // 24/11 : la vidéo des nouveautés n'est plus proposée (demande d'Eliott)
   if(!ST.un) return showSleep();
   const p = ST.list.find(x => x.date === ST.today);
   // La page du soir rejoue toujours le geste, même déjà lue (consigne : tout le parcours à chaque arrivée)
@@ -1603,7 +1612,14 @@ function showSecrets(){
 
 /* ---------- Écrans d'attente ---------- */
 /* Idée 1 (24/11) : le chat endormi réagit quand elle le touche (yeux ouverts, ronron, petite bulle) */
-const CHAT_VIDEO = 'chat.mp4?v=1', CHAT_POSTER = 'chat.jpg?v=1';   // vides = le dessin
+/* Le chat peint (HeyGen, projet grimoire-chat/). Demande d'Eliott du 24/11 :
+   endormi → au toucher il se réveille et s'assoit → il attend des caresses (chaque toucher = une caresse)
+   → 7 s sans caresse, il se rallonge sur le grimoire. Le dessin SVG reste en secours si les vidéos ne chargent pas. */
+const CHAT = { dort:'chat-dort.jpg?v=2', eveil:'chat-eveil.mp4?v=2', attend:'chat-attend.mp4?v=2', caresse:'chat-caresse.mp4?v=2',
+  couche:'chat-couche.mp4?v=2', cachet:'chat-cachet.mp4?v=2' };
+const CHAT_PATIENCE = 7000;
+const INVITES = ['Caresse-moi ?', 'Et alors, cette caresse ?', 'Je t\'attends…'];
+const MERCIS = ['Prrrr…', 'Encore !', 'Mrrrou ♥', 'Juste là, oui…'];
 const RONRONS = ['Mrrr…', 'Prrrt ?', 'Encore cinq minutes…', 'Mrrrou.', 'Zzz… quoi ?'];
 function ronron(){
   if(!Snd.on || !Snd.init()) return;
@@ -1619,27 +1635,72 @@ function ronron(){
 function chatTouchable(where){
   const art = where.querySelector('.art'); if(!art) return;
   const b = el('button', 'chat-btn'); b.type = 'button'; b.setAttribute('aria-label', 'Caresser le chat');
-  art.replaceWith(b); b.append(art);
-  const bulle = el('span', 'bulle'); bulle.setAttribute('aria-live', 'polite'); b.append(bulle);
-  // Le chat peint (HeyGen) : endormi au repos, il se réveille quand elle le touche. Le dessin reste en secours.
-  let v = null;
-  if(CHAT_VIDEO){
-    v = document.createElement('video'); v.className = 'art chat-v'; v.src = CHAT_VIDEO; v.poster = CHAT_POSTER;
-    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.setAttribute('aria-hidden', 'true');
-    v.onerror = () => { if(v.parentNode) v.replaceWith(art); v = null; };
-    v.onended = () => { try{ v.currentTime = 0; }catch(e){} };
-    art.replaceWith(v);
-  }
-  let n = 0, tm = 0;
-  b.onclick = () => {
-    clearTimeout(tm); b.classList.remove('eveil'); void b.offsetWidth; b.classList.add('eveil');
-    bulle.textContent = RONRONS[n++ % RONRONS.length];
-    buzz([12, 40, 12]);
-    if(v && v.parentNode){
-      try{ v.muted = !Snd.on; v.currentTime = 0; const pr = v.play(); if(pr) pr.catch(() => { v.muted = true; v.play().catch(() => {}); }); }catch(e){}
-    } else ronron();
-    tm = setTimeout(() => { b.classList.remove('eveil'); bulle.textContent = ''; }, v && v.parentNode ? 4200 : 1900);
+  art.replaceWith(b);
+  const bulle = el('span', 'bulle'); bulle.setAttribute('aria-live', 'polite');
+  const scene = el('span', 'chat-scene');
+  const fond = document.createElement('img'); fond.className = 'chat-fond'; fond.alt = ''; fond.src = CHAT.dort;
+  scene.append(fond);
+  const V = {};
+  ['eveil', 'attend', 'caresse', 'couche'].forEach(k => {
+    const v = document.createElement('video'); v.className = 'chat-v'; v.src = CHAT[k]; v.muted = true; v.playsInline = true;
+    v.setAttribute('playsinline', ''); v.preload = 'auto'; v.setAttribute('aria-hidden', 'true'); V[k] = v; scene.append(v);
+  });
+  b.append(scene, bulle);
+  // Secours : si l'image peinte ne charge pas, on revient au dessin d'origine
+  let secours = false;
+  fond.onerror = () => { secours = true; scene.replaceWith(art); };
+
+  let etat = 'dort', tAttente = 0, tBulle = 0, nb = 0;
+  const dire = (t, ms) => { clearTimeout(tBulle); bulle.textContent = t; b.classList.add('parle'); tBulle = setTimeout(() => { b.classList.remove('parle'); }, ms || 2200); };
+  // Affiche la vidéo `k` (fondu court dès sa première image), puis `fin` à la fin
+  const jouer = (k, opt) => {
+    opt = opt || {};
+    const v = V[k];
+    Object.values(V).forEach(x => { if(x !== v){ x.onended = null; } });
+    v.loop = !!opt.loop; v.onended = opt.fin || null;
+    try{ v.currentTime = 0; }catch(e){}
+    v.muted = !Snd.on;
+    const montre = () => { Object.values(V).forEach(x => { if(x !== v){ x.classList.remove('on'); try{ x.pause(); }catch(e){} } }); v.classList.add('on'); };
+    v.addEventListener('playing', montre, {once:true});
+    const pr = v.play(); if(pr) pr.catch(() => { v.muted = true; v.play().then(montre).catch(() => { if(opt.fin) opt.fin(); }); });
   };
+  const attendre = () => {
+    etat = 'attend'; jouer('attend', {loop:true});
+    dire(INVITES[nb % INVITES.length], 2600);
+    clearTimeout(tAttente);
+    tAttente = setTimeout(coucher, CHAT_PATIENCE);
+  };
+  const coucher = () => {
+    etat = 'couche'; clearTimeout(tAttente);
+    jouer('couche', {fin:() => { etat = 'dort'; }});   // il reste couché sur la dernière image
+  };
+  const eveiller = () => { etat = 'eveil'; jouer('eveil', {fin:attendre}); dire(RONRONS[nb % RONRONS.length]); };
+  b.onclick = () => {
+    if(secours){ b.classList.remove('eveil'); void b.offsetWidth; b.classList.add('eveil'); dire(RONRONS[nb++ % RONRONS.length], 1900); buzz([12, 40, 12]); ronron(); return; }
+    buzz([12, 40, 12]);
+    if(etat === 'dort' || etat === 'couche') eveiller();
+    else if(etat === 'attend'){
+      etat = 'caresse'; clearTimeout(tAttente);
+      dire(MERCIS[nb % MERCIS.length]); nb++;
+      jouer('caresse', {fin:attendre});
+    }
+    else { dire(MERCIS[nb % MERCIS.length]); nb++; }   // pendant le réveil ou une caresse : juste un petit mot
+  };
+  b.chatOccupe = () => etat !== 'dort';
+}
+// « Page du soir » : le chat décroche le cachet de cire et ouvre le grimoire, puis la page d'attente
+function chatOuvreLeGrimoire(suite){
+  if(RM){ suite(); return; }
+  const w = el('div', 'intro-v chat-ouvre');
+  w.innerHTML = '<video playsinline preload="auto" src="' + CHAT.cachet + '" aria-hidden="true"></video><button class="intro-skip" type="button">Passer</button>';
+  const v = w.querySelector('video');
+  let fini = false;
+  const fin = () => { if(fini) return; fini = true; w.classList.add('sort'); setTimeout(() => { w.remove(); }, 450); suite(); };
+  v.muted = !Snd.on; v.onended = fin; v.onerror = fin;
+  w.querySelector('.intro-skip').onclick = fin;
+  document.body.append(w);
+  const pr = v.play(); if(pr) pr.catch(() => { v.muted = true; v.play().catch(fin); });
+  setTimeout(fin, 9000);   // filet de sécurité
 }
 /* Idée 3 : un salut qui change avec l'heure */
 function salut(){
@@ -1708,7 +1769,7 @@ function showSleep(){
   const LUNE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></svg>';
   if(jeuValide(j)) porte(gagne ? 'fait' : 'neuf', KEY, 'Secret du jour', gagne ? 'Trouvé. Le relire' : 'Un jeu t\'attend', () => { location.hash = 'secrets'; });
   else if(vus) porte('fait', KEY, 'Tes secrets', vus + (vus > 1 ? ' trouvés' : ' trouvé'), () => { location.hash = 'secrets'; });
-  const soir = porte('soir', LUNE, 'Page du soir', 'Dans <b class="cdm"></b>', () => { location.hash = 'attente'; });
+  const soir = porte('soir', LUNE, 'Page du soir', 'Dans <b class="cdm"></b>', () => { reveilSon(); chatOuvreLeGrimoire(() => { location.hash = 'attente'; }); });
   soir.setAttribute('aria-label', 'Page du soir, à ' + HEURE_DEBLOCAGE + ' heures');
   d.append(choix);
   boutonPlume(d);
@@ -1904,7 +1965,7 @@ function showCiel(sel){
   const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
   boutonPlume(d);
   back.style.marginTop = cur > 0 ? '0' : '26px';
-  d.append(back); boutonNouveautes(d);
+  d.append(back);
   view.append(d);
   if(lit > vu){ S.cielVu = lit; saveS(); }
   focusSoft(d.querySelector('h1'));
