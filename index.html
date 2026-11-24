@@ -779,6 +779,14 @@ canvas.trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:non
 #view.arrivee{animation:arrivee 1.6s ease .35s both}
 @keyframes arrivee{from{opacity:0;transform:translateY(10px) scale(.985);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
 html.rm .accueil-chat.fondu,html.rm .accueil-chat.fondu video,html.rm #view.arrivee{transition:none;animation:none}
+
+/* « caresse-moi… » sous le chat endormi */
+.chat-btn .indice{position:absolute;left:0;right:0;bottom:4px;z-index:2;text-align:center;font-style:italic;font-size:.98rem;letter-spacing:.02em;color:var(--gold-pale);
+  opacity:0;transition:opacity .6s;pointer-events:none;text-shadow:0 0 10px rgba(0,0,0,.9)}
+.chat-btn.endormi .indice{opacity:.75;animation:indice 3.2s ease-in-out 1s infinite}
+.chat-btn.endormi.parle .indice{opacity:0;animation:none}
+@keyframes indice{50%{opacity:.35}}
+html.rm .chat-btn.endormi .indice{animation:none}
 </style>
 </head>
 <body>
@@ -1682,7 +1690,9 @@ function chatTouchable(where){
     const v = document.createElement('video'); v.className = 'chat-v'; v.src = CHAT[k]; v.muted = true; v.playsInline = true;
     v.setAttribute('playsinline', ''); v.preload = 'auto'; v.setAttribute('aria-hidden', 'true'); V[k] = v; scene.append(v);
   });
-  b.append(scene, bulle);
+  // Petit mot sous le chat quand il dort : on peut le caresser
+  const indice = el('span', 'indice', 'caresse-moi…'); indice.setAttribute('aria-hidden', 'true');
+  b.append(scene, bulle, indice); b.classList.add('endormi');
   // Secours : si l'image peinte ne charge pas, on revient au dessin d'origine
   let secours = false;
   fond.onerror = () => { secours = true; scene.replaceWith(art); };
@@ -1709,9 +1719,9 @@ function chatTouchable(where){
   };
   const coucher = () => {
     etat = 'couche'; clearTimeout(tAttente);
-    jouer('couche', {fin:() => { etat = 'dort'; }});   // il reste couché sur la dernière image
+    jouer('couche', {fin:() => { etat = 'dort'; b.classList.add('endormi'); }});   // il reste couché sur la dernière image
   };
-  const eveiller = () => { etat = 'eveil'; jouer('eveil', {fin:attendre}); dire(RONRONS[nb % RONRONS.length]); };
+  const eveiller = () => { etat = 'eveil'; b.classList.remove('endormi'); jouer('eveil', {fin:attendre}); dire(RONRONS[nb % RONRONS.length]); };
   const caresse = () => {
     if(secours){ b.classList.remove('eveil'); void b.offsetWidth; b.classList.add('eveil'); dire(RONRONS[nb++ % RONRONS.length], 1900); buzz([12, 40, 12]); ronron(); return; }
     buzz([12, 40, 12]);
