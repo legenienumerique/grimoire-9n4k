@@ -995,7 +995,9 @@ const Music = {
   }
 };
 let curTrack = null, curMode = 'amb';
-function music(track, mode){ curTrack = track; curMode = mode; if(track) Music.play(track, mode); else Music.stop(); }
+// Pendant l'intro du chat, pas de musique : on retient la chanson et elle démarre à l'arrivée sur l'accueil (demande d'Eliott, 24/11)
+let musiqueRetenue = false;
+function music(track, mode){ curTrack = track; curMode = mode; if(musiqueRetenue) return; if(track) Music.play(track, mode); else Music.stop(); }
 /* Accueil, grimoire endormi, encre pas sèche, sommaire : une chanson douce, tout bas,
    sur son passage calme. Elle change chaque jour. */
 const VOL_NUIT = .22;
@@ -2832,6 +2834,7 @@ function showIntro(){
     + '<div class="bas"></div>';
   let fini = false;
   // On charge les pages pendant qu'elle caresse le chat (route() ne dessine rien tant que l'intro est là)
+  musiqueRetenue = true;
   const pret = boot();
   const done = () => {
     if(fini) return; fini = true; introOn = false;
@@ -2842,6 +2845,8 @@ function showIntro(){
     const a = document.querySelector('.accueil');
     Promise.resolve(pret).catch(() => {}).finally(() => {
       route();   // les pages sont déjà chargées pendant l'intro : l'accueil s'affiche tout de suite
+      // La musique arrive avec l'accueil, quand la lumière s'efface
+      setTimeout(() => { musiqueRetenue = false; if(curTrack) Music.play(curTrack, curMode); }, RM || !a ? 0 : 900);
       if(!a) return;
       view.classList.remove('arrivee'); void view.offsetWidth; view.classList.add('arrivee');
       setTimeout(() => view.classList.remove('arrivee'), 2200);
@@ -2856,12 +2861,12 @@ function showIntro(){
     buzz([12, 40, 12]);
     d.classList.add('ouvre');
     if(RM){ done(); return; }
-    ouv.muted = !Snd.on;
+    ouv.muted = true;   // pas de son ni de musique pendant l'intro : la musique commence à l'accueil
     ouv.onended = done; ouv.onerror = done;
     // Le fondu commence pendant la dernière seconde, quand la lumière monte des pages
     ouv.addEventListener('timeupdate', () => { if(ouv.duration && ouv.currentTime > ouv.duration - 1.1) done(); });
     setTimeout(done, 9000);   // filet de sécurité
-    const po = ouv.play(); if(po) po.catch(() => { ouv.muted = true; ouv.play().catch(done); });
+    const po = ouv.play(); if(po) po.catch(done);
   };
   const inv = () => d.querySelector('.invite');
   caressable(go, {seuil:240, caresse:ouvrir, actif:() => !d.classList.contains('ouvre'),
