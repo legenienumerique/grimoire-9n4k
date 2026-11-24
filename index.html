@@ -2371,55 +2371,19 @@ function showIntro(){
     S.intro = 1; saveS();
     try{ sessionStorage.setItem(INTRO_KEY, '1'); }catch(e){}
     const a = document.querySelector('.accueil'); if(a) a.remove();
-    const w = document.querySelector('.intro-v');
-    if(w){
-      const v = w.querySelector('video'), pos = v.currentTime || 0, t = pisteDuSoir(); try{ v.pause(); }catch(e){} w.remove();
-      // La vidéo place l'envolée de la chanson à 26 s : le grimoire reprend la chanson au même endroit
-      if(t && pos > 1) Music.suite = {track:t, at:Math.max(0, t.envol - 26) + pos + (w.dataset.decal ? +w.dataset.decal : 0)};
-    }
     boot();
   };
   const go = el('button', 'lbtn rouge', 'Ouvrir le grimoire'); go.type = 'button';
   go.onclick = () => {
     if(d.classList.contains('ouvre')) return;
-    reveilSon();   // la musique suivra dans le grimoire (sauf si elle a coupé le son)
-    const slug = (pisteDuSoir() || MUSIQUES[0]).fichier.replace(/\.mp3$/, '');
-    // Saison à deux : intro « Deux plumes » en entier à la 1re visite de la soirée, puis sa fin seule (5 s, à partir de 24,6 s)
-    const s2 = saisonDeux(), soir = iso(new Date(clock().getTime() - 6 * 3600 * 1000));
-    const court = s2 && S.intro2 === soir;
-    if(s2 && !court){ S.intro2 = soir; saveS(); }
-    const src = s2 ? (court ? 'intro2c-' : 'intro2-') + slug + '.mp4?v=1' : 'intro-' + slug + '.mp4?v=2';
-    const w = el('div', 'intro-v');
-    if(court) w.dataset.decal = '24.6';
-    w.innerHTML = '<video playsinline preload="auto" src="' + src + '" aria-describedby="intro-txt"></video>'
-      + '<button class="intro-skip" type="button">Passer</button>'
-      + (s2
-        ? '<p id="intro-txt" class="sr-only">' + (court ? '' : 'La chouette dépose la page sur un bureau, près d’un encrier où attendent deux plumes, une d’or et une rouge. Il y a deux plumes, maintenant. La plume d’or écrit : il a écrit pour toi chaque nuit. La plume rouge écrit à côté : ce soir, tu écris avec lui. Les encres s’envolent par la fenêtre. ') + 'Dans le ciel, des étoiles d’or et rouges forment une constellation. Notre ciel s’écrit à deux. Signé Dieu.</p>'
-        : '<p id="intro-txt" class="sr-only">L’œil d’une chouette s’ouvre, la pleine lune dans la pupille. La nuit, quelqu’un veille. Ses serres tiennent une page scellée de cire rouge : il t’a écrit une page. La chouette passe devant la lune, au-dessus d’un temple grec, puis traverse une ville endormie pour toi. Elle se pose à une fenêtre éclairée et y dépose la page. Ta page t’attend. Signé Dieu.</p>');
-    const v = w.querySelector('video');
-    v.muted = !Snd.on;   // si elle a coupé le son, la vidéo reste muette aussi
-    // iPhone : la vidéo de la chouette doit être lancée pendant le toucher pour garder le son ; on l'arrête aussitôt
-    let prete = false;
-    try{ const p0 = v.play(); if(p0) p0.then(() => { if(!prete){ v.pause(); v.currentTime = 0; } }).catch(() => {}); }catch(e){}
-    w.style.visibility = 'hidden'; document.body.append(w);
-    // Le grimoire s'ouvre (5 s), puis la chouette
+    reveilSon();   // la musique démarre dans le grimoire (sauf si elle a coupé le son)
+    // 24/11 : plus de vidéo de la chouette. Le grimoire s'ouvre (5 s), puis on arrive directement à l'accueil
     const ouv = d.querySelector('.ouv');
-    let lance = false;
-    const chouette = () => {
-      if(lance || fini) return; lance = true; prete = true;
-      w.style.visibility = ''; d.remove();
-      try{ v.currentTime = 0; }catch(e){}
-      v.onended = done; v.onerror = done;
-      w.querySelector('.intro-skip').onclick = done;
-      const pr = v.play();
-      if(pr) pr.catch(() => { v.muted = true; v.play().catch(done); });
-      focusSoft(w.querySelector('.intro-skip'));
-    };
     d.classList.add('ouvre');
-    if(RM){ chouette(); return; }
-    ouv.onended = chouette; ouv.onerror = chouette;
-    setTimeout(chouette, 6500);   // filet de sécurité
-    const po = ouv.play(); if(po) po.catch(chouette);
+    if(RM){ done(); return; }
+    ouv.onended = done; ouv.onerror = done;
+    setTimeout(done, 6500);   // filet de sécurité
+    const po = ouv.play(); if(po) po.catch(done);
   };
   d.querySelector('.bas').append(go);
   document.body.append(d);
