@@ -606,20 +606,78 @@ body{font-size:17px;background:radial-gradient(ellipse 120% 60% at 50% -10%,#161
 /* Animations réduites */
 html.rm *,html.rm *::before,html.rm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
 html.rm #petals{display:none}
+
+/* =========================================================
+   COUP DE PROPRE 24/11 : moins à l'écran
+   En-tête sur une ligne (icônes + menu ⋯), Sommaire en pages posées sur la table, jeu du jour dans une carte.
+   ========================================================= */
+.top{position:sticky;gap:0}
+.brand{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbtn{min-width:44px;padding:0 8px}
+.tbtn svg{width:21px;height:21px}
+#bMenu[aria-expanded="true"]{color:var(--gold)}
+body:not(.a-ce-soir) .jx{display:none}
+.menu{position:absolute;right:0;top:calc(100% - 4px);z-index:40;min-width:250px;padding:6px;border:1px solid var(--hair);border-radius:8px;
+  background:#0d0a07;box-shadow:0 18px 40px rgba(0,0,0,.65)}
+.menu[hidden]{display:none}
+.mi{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:0 12px;border:0;border-radius:5px;background:none;cursor:pointer;
+  text-align:left;font-family:var(--serif);font-size:1.08rem;color:var(--ink)}
+.mi:hover,.mi:focus-visible{background:rgba(201,169,110,.1)}
+.mi[hidden]{display:none}
+.mi svg{flex:0 0 20px;width:20px;height:20px;color:var(--gold)}
+.mi .lab{flex:1}
+.mi .etat{font-style:italic;font-size:.95rem;color:var(--muted)}
+
+/* Écran de journée : le chat, le compte à rebours, puis le jeu dans une carte */
+.screen .cd{margin-bottom:10px}
+.screen > .jour{margin:26px 0 0;padding:26px 18px 22px;border:1px solid var(--hair);border-radius:8px;background:linear-gradient(rgba(201,169,110,.05),rgba(201,169,110,.015))}
+.screen > .jour::before{background:var(--bg)}
+.secrets-page > .jour{margin-top:30px}
+
+/* Sommaire : des pages posées sur la table */
+.som h1{margin-bottom:2px}
+.som .sub{margin-bottom:22px}
+.pg{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;min-height:118px;padding:14px 10px;
+  border:1px solid var(--hair);border-radius:6px;background:linear-gradient(170deg,#16110b,#0b0806 70%);cursor:pointer;color:var(--ink);
+  transition:border-color .2s,transform .2s}
+.pg:hover,.pg:focus-visible{border-color:rgba(201,169,110,.6)}
+.pg:active{transform:scale(.98)}
+.pg .r{font-size:2.3rem;font-weight:500;font-style:italic;line-height:1;color:var(--gold);font-variant-numeric:lining-nums}
+.pg .d{font-size:1rem;color:var(--muted)}
+.pg .nom{font-style:italic;font-size:.98rem;color:var(--gold-pale)}
+.pg .cachet{position:absolute;top:9px;right:9px;width:18px;height:18px;border-radius:47% 53% 50% 50%/52% 48% 52% 48%;
+  background:radial-gradient(circle at 35% 30%,#d0213f,#8b0000 60%,#4a0008);box-shadow:0 1px 3px rgba(0,0,0,.6)}
+.pg.fin .r,.pg.elle .r,.pg.elle .nom{color:var(--red-text)}
+.pg.elle{border-color:rgba(179,0,27,.45);background:linear-gradient(170deg,#1c0a0c,#0b0606 70%)}
+/* La page du soir : la seule mise en avant */
+.pg.grande{min-height:150px;margin:0 0 12px;border-color:rgba(201,169,110,.55);
+  background:radial-gradient(ellipse 80% 90% at 50% 0%,rgba(201,169,110,.16),transparent 70%),linear-gradient(170deg,#1a140c,#0b0806 75%);
+  box-shadow:0 0 0 1px rgba(201,169,110,.08),0 10px 30px rgba(201,169,110,.08)}
+.pg.grande .r{font-size:3.2rem}
+.pg.grande .etat{margin-top:6px;padding:3px 12px;border:1px solid rgba(201,169,110,.45);border-radius:999px;font-style:italic;font-size:.95rem;color:var(--gold)}
+.pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:0 0 30px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
     <button class="brand" id="bHome" type="button">Le Grimoire</button>
-    <button class="tbtn" id="bSom" type="button" hidden>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5.5C6 4 9 4 12 6c3-2 6-2 9-.5V19c-3-1.5-6-1.5-9 .5-3-2-6-2-9-.5z"/><path d="M12 6v13.5"/></svg>Sommaire</button>
+    <button class="tbtn" id="bSom" type="button" hidden aria-label="Sommaire">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5.5C6 4 9 4 12 6c3-2 6-2 9-.5V19c-3-1.5-6-1.5-9 .5-3-2-6-2-9-.5z"/><path d="M12 6v13.5"/></svg></button>
     <button class="tbtn" id="bCiel" type="button" hidden aria-label="Ton ciel">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 6.3L20.5 12l-6.3 2.7L12 21l-2.2-6.3L3.5 12l6.3-2.7z"/></svg></button>
     <button class="tbtn" id="bSec" type="button" hidden aria-label="Les secrets de Dieu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3.5M21 12v2.5"/></svg></button>
-    <button class="tbtn" id="bSon" type="button" aria-pressed="false" aria-label="Activer le son">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="w1" d="M16 9.5c1 1.4 1 3.6 0 5"/><path class="x1" d="M16.5 9.5l4 5m0-5l-4 5"/></svg></button>
+    <button class="tbtn" id="bMenu" type="button" aria-label="Plus d'options" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>
+    <div class="menu" id="menu" hidden>
+      <button class="mi" id="bSon" type="button" aria-pressed="false" aria-label="Activer le son">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="w1" d="M16 9.5c1 1.4 1 3.6 0 5"/><path class="x1" d="M16.5 9.5l4 5m0-5l-4 5"/></svg><span class="lab">Musique</span><span class="etat"></span></button>
+      <button class="mi" id="mNouv" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><span class="lab">Revoir les nouveautés</span></button>
+      <button class="mi" id="mInstall" type="button" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M12 7.5v7M9 11.5l3 3 3-3"/></svg><span class="lab">Garder sur mon écran d'accueil</span></button>
+    </div>
   </header>
   <p class="jx" id="jx" hidden></p>
   <main id="view"><p class="loading">On tourne les pages…</p></main>
@@ -903,15 +961,16 @@ function majURLCiel(){
   const v = S.lus.filter(d => /^\d{4}-\d\d-\d\d$/.test(d)).map(d => d.slice(2).replace(/-/g, '')).join('.');
   try{ history.replaceState(history.state, '', location.pathname + (v ? '?ciel=' + v : '') + location.hash); }catch(e){}
 }
-function inviteInstall(where){
-  if(STANDALONE || S.install || !(IOS || ANDROID) || where.querySelector('.install')) return;
+const peutInstaller = () => !STANDALONE && S.install !== 'ok' && (IOS || ANDROID);
+function inviteInstall(where, force){
+  if(!peutInstaller() || (S.install && !force) || where.querySelector('.install')) return;
   const box = el('div', 'rappel install'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Garder le grimoire sur ton écran d\'accueil');
   let etapes = [], bouton = '';
   if(DANS_APPLI) etapes = ['Touche ⋯ en haut à droite.', 'Choisis « Ouvrir dans le navigateur » (ou « dans Safari »).', 'Reviens ici : la suite t\'attendra.'];
   else if(IOS){ etapes = ['Touche le bouton Partager (le carré avec une flèche vers le haut).', 'Choisis « Sur l\'écran d\'accueil ».', 'Touche « Ajouter ».']; majURLCiel(); }
   else if(promptInstall) bouton = '<button class="lbtn rouge inst-go" type="button">Ajouter à l\'écran d\'accueil</button>';
   else etapes = ['Touche ⋮ en haut à droite.', 'Choisis « Ajouter à l\'écran d\'accueil » ou « Installer l\'application ».'];
-  box.innerHTML = '<p class="q">Veux-tu garder ton grimoire sur ton écran d\'accueil, comme une vraie appli ? Il s\'ouvrira même sans réseau.</p>'
+  box.innerHTML = '<p class="q">Il s\'ouvrira comme une appli, même sans réseau.</p>'
     + (etapes.length ? '<ol class="etapes">' + etapes.map(t => '<li>' + esc(t) + '</li>').join('') + '</ol>' : '') + bouton
     + (etapes.length && !DANS_APPLI ? '<button class="lbtn inst-fait" type="button" style="margin-top:4px">C\'est fait, il est sur mon écran</button>' : '')
     + '<button class="rap-non" type="button">Non merci</button>';
@@ -937,6 +996,7 @@ const majSon = () => {
   bSon.setAttribute('aria-label', Snd.on ? 'Couper le son et la musique' : 'Activer le son et la musique');
   bSon.querySelector('.w1').style.display = Snd.on ? '' : 'none';
   bSon.querySelector('.x1').style.display = Snd.on ? 'none' : '';
+  bSon.querySelector('.etat').textContent = Snd.on ? 'activée' : 'coupée';
 };
 // Réveille le son (le téléphone exige un toucher avant toute musique)
 const reveilSon = () => {
@@ -1141,6 +1201,9 @@ function screen(){
 function route(){
   if(introOn) return;
   const h = location.hash;
+  fermerMenu();
+  document.body.classList.toggle('a-ce-soir', !h || h === '#');   // le compte « J-x » ne s'affiche que sur l'écran du soir
+  if(h === '#installer' && peutInstaller()) return showInstaller();
   if(h === '#sommaire' && ST.list.length) return showSommaire();
   if(h === '#ciel' && ST.list.length) return showCiel();
   if(h === '#ecrire' && ST.s2) return showEcrire();
@@ -1154,6 +1217,32 @@ $('#bHome').addEventListener('click', () => { if(location.hash) location.hash = 
 $('#bSom').addEventListener('click', () => { location.hash = 'sommaire'; });
 $('#bCiel').addEventListener('click', () => { location.hash = 'ciel'; });
 $('#bSec').addEventListener('click', () => { location.hash = 'secrets'; });
+
+/* Le menu « ⋯ » : musique, nouveautés, installation. Tout ce qui n'a pas besoin d'être à l'écran en permanence. */
+const bMenu = $('#bMenu'), menu = $('#menu');
+function fermerMenu(){ if(menu.hidden) return; menu.hidden = true; bMenu.setAttribute('aria-expanded', 'false'); }
+bMenu.addEventListener('click', e => {
+  e.stopPropagation();
+  if(!menu.hidden){ fermerMenu(); return; }
+  $('#mInstall').hidden = !peutInstaller();
+  menu.hidden = false; bMenu.setAttribute('aria-expanded', 'true');
+  focusSoft(menu.querySelector('.mi'));
+});
+document.addEventListener('click', e => { if(!menu.hidden && !menu.contains(e.target)) fermerMenu(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !menu.hidden){ fermerMenu(); bMenu.focus(); } });
+$('#mNouv').addEventListener('click', () => { fermerMenu(); reveilSon(); showNouveautes(route, true); });
+$('#mInstall').addEventListener('click', () => { fermerMenu(); location.hash = 'installer'; });
+function showInstaller(){
+  screen(); music(nuitTrack(), 'nuit');
+  const d = el('section', 'screen');
+  d.innerHTML = '<h1 class="msg" tabindex="-1">Sur ton écran d\'accueil</h1>';
+  inviteInstall(d, true);
+  const back = el('button', 'lbtn', 'Revenir'); back.type = 'button'; back.style.marginTop = '22px';
+  back.onclick = () => { history.length > 1 ? history.back() : (location.hash = ''); };
+  d.append(back);
+  view.append(d);
+  focusSoft(d.querySelector('h1'));
+}
 
 /* ---------- La vidéo des nouveautés ----------
    Proposée une fois, à sa première arrivée (à toute heure), avant le reste.
@@ -1403,12 +1492,10 @@ function showSecrets(){
 function showSleep(){
   screen(); music(nuitTrack(), 'nuit');
   const d = el('section', 'screen');
-  d.innerHTML = CAT_SLEEP + '<h1 class="msg">Le grimoire dort encore. Reviens à la tombée de la nuit, princesse.</h1>'
+  d.innerHTML = CAT_SLEEP + '<h1 class="msg">Le grimoire dort, princesse.</h1>'
     + '<p class="cd" role="timer" aria-live="off">Il s\'éveille dans <b aria-hidden="true"></b><span class="sr-only">quelques heures, à ' + HEURE_DEBLOCAGE + ' heures.</span></p>';
   jeuDuJour(d);
-  if(ST.list.length){ const b = el('button', 'lbtn', 'Feuilleter les pages passées'); b.type = 'button'; b.onclick = () => { location.hash = 'sommaire'; }; d.append(b); }
   boutonPlume(d);
-  inviteSon(d); inviteRappel(d); inviteInstall(d); if(S.nouv) boutonNouveautes(d);
   view.append(d);
   const out = d.querySelector('.cd b');
   const tick = () => {
@@ -1424,8 +1511,6 @@ function showInk(){
   screen(); music(nuitTrack(), 'nuit');
   const d = el('section', 'screen');
   d.innerHTML = INK + '<h1 class="msg">L\'encre n\'a pas encore séché. Reviens un peu plus tard.</h1>';
-  if(ST.list.length){ const b = el('button', 'lbtn', 'Feuilleter les pages passées'); b.type = 'button'; b.onclick = () => { location.hash = 'sommaire'; }; d.append(b); }
-  inviteSon(d); inviteRappel(d);
   view.append(d);
   later(boot, 120000);   // on réessaie toutes les 2 minutes
 }
@@ -1435,27 +1520,28 @@ function showSommaire(){
   screen(); music(nuitTrack(), 'nuit');
   const d = el('section', 'som');
   const lues = ST.list.filter(estLue).length;
-  d.innerHTML = '<h1>Sommaire</h1><p class="sub">' + ST.list.length + (ST.list.length > 1 ? ' pages' : ' page') + ', dont ' + lues + (lues > 1 ? ' scellées' : ' scellée') + '</p>';
-  const ol = el('ol', 'toc');
-  ST.list.forEach(p => {
-    const li = el('li'), b = el('button', p.kind === 'fin' ? 'fin' : p.kind === 'elle' ? 'elle' : ''); b.type = 'button';
+  d.innerHTML = '<h1 tabindex="-1">Sommaire</h1><p class="sub">' + lues + (lues > 1 ? ' pages lues' : ' page lue') + ' sur ' + ST.list.length + '</p>';
+  // Refonte 24/11 : des pages posées sur la table, la plus récente d'abord ; celle du soir en grand
+  const carte = (p, grande) => {
+    const b = el('button', 'pg' + (grande ? ' grande' : '') + (p.kind === 'fin' ? ' fin' : p.kind === 'elle' ? ' elle' : '')); b.type = 'button';
     const read = estLue(p);
-    // Le nom de l'auteur n'apparaît qu'une fois la page lue (pas de surprise gâchée)
-    const qui = p.kind === 'elle' ? 'Ta page' : p.kind === 'fin' ? 'La dernière page' : p.kind === 'bascule' ? 'Le masque' : (read && p.auteur ? p.auteur : '');
-    b.innerHTML = '<span class="r" aria-hidden="true">' + roman(p.n) + '</span>' + (qui ? '<span class="qui" aria-hidden="true">' + esc(qui) + '</span>' : '')
-      + '<span class="pts" aria-hidden="true"></span><span class="d" aria-hidden="true">' + esc(fmtDay(p.date)) + '</span>'
-      + '<span class="' + (read ? 'cachet' : 'vide') + '" aria-hidden="true"></span>';
+    const nom = p.kind === 'elle' ? 'Ta page' : p.kind === 'fin' ? 'Dernière page' : p.kind === 'bascule' ? 'Le masque' : grande ? 'Ce soir' : '';
+    b.innerHTML = (nom ? '<span class="nom" aria-hidden="true">' + esc(nom) + '</span>' : '')
+      + '<span class="r" aria-hidden="true">' + roman(p.n) + '</span>'
+      + '<span class="d" aria-hidden="true">' + esc(fmtDay(p.date)) + '</span>'
+      + (read && p.kind !== 'elle' ? '<span class="cachet" aria-hidden="true"></span>' : '')
+      + (!read && grande ? '<span class="etat" aria-hidden="true">à ouvrir</span>' : '');
     b.setAttribute('aria-label', (p.kind === 'fin' ? 'Dernière page, ' : p.kind === 'elle' ? 'Ta page, ' : 'Page ' + p.n + ', ') + fmtLong(p.date) + (p.kind === 'elle' ? '' : read ? ', lue' : ', pas encore lue'));
     b.onclick = () => { location.hash = 'page-' + p.n; };
-    li.append(b); ol.append(li);
-  });
-  d.append(ol);
-  const ciel = el('button', 'nouv-etoile', '✦ Ton ciel · ' + lues + (lues > 1 ? ' étoiles' : ' étoile')); ciel.type = 'button'; ciel.style.margin = '0 auto 14px';
-  ciel.onclick = () => { location.hash = 'ciel'; }; d.append(ciel);
-  if(!$('#bSec').hidden){ const sec = el('button', 'nouv-etoile', '🗝 Les secrets de Dieu'); sec.type = 'button'; sec.style.margin = '0 auto 14px'; sec.onclick = () => { location.hash = 'secrets'; }; d.append(sec); }
+    return b;
+  };
+  const liste = ST.list.slice().reverse();
+  const soir = liste[0] && liste[0].date === ST.today && liste[0].kind !== 'elle' ? liste.shift() : null;
+  if(soir) d.append(carte(soir, true));
+  const grille = el('div', 'pages'); grille.setAttribute('role', 'list');
+  liste.forEach(p => { const c = carte(p); c.setAttribute('role', 'listitem'); grille.append(c); });
+  d.append(grille);
   boutonPlume(d);
-  const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
-  d.append(back); boutonNouveautes(d);
   view.append(d);
   focusSoft(d.querySelector('h1'));
 }
@@ -1636,12 +1722,11 @@ function showPage(p, opt){
   const idx = ST.list.indexOf(p), prev = ST.list[idx - 1], next = ST.list[idx + 1];
   const nb = (txt, aria, fn) => { const b = el('button', 'lbtn', txt); b.type = 'button'; if(aria) b.setAttribute('aria-label', aria); b.onclick = fn; after.append(b); };
   if(prev) nb('‹ ' + roman(prev.n), 'Page précédente, ' + prev.n, () => { location.hash = 'page-' + prev.n; });
-  nb('Feuilleter le grimoire', null, () => { location.hash = 'sommaire'; });
+  nb('Sommaire', null, () => { location.hash = 'sommaire'; });
   if(next) nb(roman(next.n) + ' ›', 'Page suivante, ' + next.n, () => { location.hash = 'page-' + next.n; });
-  if(!$('#bSec').hidden){
-    const j = SECRETS[ST.today], attend = j && j.secret && !(S.secrets || {})[ST.today];
-    nb(attend ? '🗝 Le secret du jour t\'attend' : '🗝 Les secrets', 'Les secrets de Dieu', () => { location.hash = 'secrets'; });
-  }
+  // Le secret du jour n'est rappelé que s'il attend encore (sinon la clé de l'en-tête suffit)
+  { const j = SECRETS[ST.today];
+    if(j && j.secret && !(S.secrets || {})[ST.today]) nb('🗝 Le secret du jour t\'attend', null, () => { location.hash = 'secrets'; }); }
 
   let revealed = false;
   const c = {page:p, stage, reading, hint, alt, full, later, onAlt:null,
@@ -1666,7 +1751,7 @@ function showPage(p, opt){
         }
         if(p.kind === 'bascule') boutonPlume(reading, null, true);
         else { buildToi(p, art.querySelector('.toi')); boutonPlume(art.querySelector('.toi'), null, false, true); }
-        inviteRappel(art); inviteInstall(art);
+        inviteRappel(art);
       }, RM ? 0 : 1800);
       later(() => { reading.scrollIntoView({behavior:RM ? 'auto' : 'smooth', block:'start'}); focusSoft(reading); }, RM ? 0 : 380);
     }
