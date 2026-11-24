@@ -594,6 +594,9 @@ body{font-size:17px;background:radial-gradient(ellipse 120% 60% at 50% -10%,#161
 .pt-r.ok span{opacity:0}
 .secret{margin-top:26px}
 .secret .mot{text-align:left}
+.secrets-page .sub{margin:6px auto 0;max-width:24em;font-style:italic;color:var(--muted);text-align:center}
+.secrets-page .jour{margin-top:28px}
+.secrets-page > .lbtn{margin-top:26px}
 .secrets-vus{margin:26px auto 0;max-width:30em;text-align:left}
 .secrets-vus summary{min-height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-style:italic;font-size:1.1rem;color:var(--gold-pale)}
 .secrets-vus ol{margin:8px 0 0;padding:0 0 0 1.4em}
@@ -613,6 +616,8 @@ html.rm #petals{display:none}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5.5C6 4 9 4 12 6c3-2 6-2 9-.5V19c-3-1.5-6-1.5-9 .5-3-2-6-2-9-.5z"/><path d="M12 6v13.5"/></svg>Sommaire</button>
     <button class="tbtn" id="bCiel" type="button" hidden aria-label="Ton ciel">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 6.3L20.5 12l-6.3 2.7L12 21l-2.2-6.3L3.5 12l6.3-2.7z"/></svg></button>
+    <button class="tbtn" id="bSec" type="button" hidden aria-label="Les secrets de Dieu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3.5M21 12v2.5"/></svg></button>
     <button class="tbtn" id="bSon" type="button" aria-pressed="false" aria-label="Activer le son">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="w1" d="M16 9.5c1 1.4 1 3.6 0 5"/><path class="x1" d="M16.5 9.5l4 5m0-5l-4 5"/></svg></button>
   </header>
@@ -1102,6 +1107,7 @@ function build(rows, ok){
   if(ok){ S.rows = rows.filter(r => r.date < today || (r.date === today && un)); saveS(); }
   ST = {list:vis, ok, today, un, key:today + '|' + un, s2:!!RENCONTRE && (today > RENCONTRE || (today === RENCONTRE && un))};
   $('#bSom').hidden = !vis.length; $('#bCiel').hidden = !vis.length;
+  $('#bSec').hidden = !Object.keys(SECRETS).some(d => d <= today && SECRETS[d].secret);
   const jx = $('#jx');
   if(RENCONTRE){ const x = daysBetween(today, RENCONTRE); jx.hidden = x < 1; jx.textContent = 'J-' + x + ' avant la visite divine'; }
   else jx.hidden = true;
@@ -1138,6 +1144,7 @@ function route(){
   if(h === '#sommaire' && ST.list.length) return showSommaire();
   if(h === '#ciel' && ST.list.length) return showCiel();
   if(h === '#ecrire' && ST.s2) return showEcrire();
+  if(h === '#secrets') return showSecrets();
   const m = h.match(/^#page-(\d+)$/);
   if(m){ const p = ST.list.find(x => x.n === +m[1]); if(p) return showPage(p, {from:'som'}); }
   tonight();
@@ -1146,6 +1153,7 @@ window.addEventListener('hashchange', route);
 $('#bHome').addEventListener('click', () => { if(location.hash) location.hash = ''; else route(); });
 $('#bSom').addEventListener('click', () => { location.hash = 'sommaire'; });
 $('#bCiel').addEventListener('click', () => { location.hash = 'ciel'; });
+$('#bSec').addEventListener('click', () => { location.hash = 'secrets'; });
 
 /* ---------- La vidéo des nouveautés ----------
    Proposée une fois, à sa première arrivée (à toute heure), avant le reste.
@@ -1266,9 +1274,9 @@ const SECRETS = {
   '2026-11-23': {"jeu": "etoiles", "dessin": "moto", "secret": "Je ne suis pas proche de ma famille émotionnellement. Je respecte ma famille, et nous nous aimons tous malgré les défis, mais je ne leur parle pas de mes sentiments, de mes envies ou de mes blessures."},
   '2026-11-24': {"jeu": "mensonge", "vrais": ["J'adore le piano, je pourrais en écouter pendant des heures.", "J'ai une playlist de musique classique."], "faux": "L'opéra est un de mes styles de musique préférés.", "secret": "Au quotidien, j'aime quand les choses sont organisées. Je suis un peu maniaque, j'aime le propre et les choses bien faites. Parfois, je l'avoue, j'aime aussi partir ou faire une activité sur un coup de tête."},
   '2026-11-25': {"jeu": "etoiles", "dessin": "chouette", "secret": "J'aimerais visiter des musées sur l'histoire, l'astronomie et la science."},
-  '2026-11-26': {"jeu": "mensonge", "vrais": ["Le physique de mes rêves : Djilsi (youtubeur).", "La moto de mes rêves : une BMW M 1000 RR."], "faux": "Le physique de mes rêves : GMK (youtubeur).", "secret": "Je suis ambitieux, mais je manque de discipline et de cadre. Je suis aussi partisan du moindre effort, je peux être un peu fainéant."},
+  '2026-11-26': {"jeu": "mensonge", "vrais": ["Le physique de mes rêves : Djilsi (youtubeur).", "La moto de mes rêves : une BMW M 1000 RR."], "faux": "Le physique de mes rêves : GMK (youtubeur).", "secret": "J'aime autant les journées chill devant un film ou une série qu'une bonne sortie en rando ou à moto."},
   '2026-11-27': {"jeu": "etoiles", "dessin": "rose", "secret": "L'amour me fait peur, mais j'y crois."},
-  '2026-11-28': {"jeu": "mensonge", "vrais": ["Je n'ai pas approché de femmes depuis plus de 4 ans.", "Je peux parfois être un peu beauf."], "faux": "J'adore le leg day à la salle de sport.", "secret": "Je suis un solitaire. J'ai grandi seul, je me suis construit seul, j'ai échoué seul, j'ai gagné seul. Te rencontrer demain me fait paniquer, car j'ai perdu l'habitude d'être deux : ça me demande énormément de courage."},
+  '2026-11-28': {"jeu": "mensonge", "vrais": ["Aucune relation depuis plus de 4 ans.", "Je peux être un peu beauf."], "faux": "J'adore le leg day à la salle de sport.", "secret": "Je suis un solitaire. J'ai grandi seul, je me suis construit seul, j'ai échoué seul, j'ai gagné seul. Te rencontrer demain me fait paniquer, car j'ai perdu l'habitude d'être deux : ça me demande énormément de courage."},
 };
 // Test : &secrets=demo remplit les jours vides avec des textes d'essai
 if(T.test && Q.get('secrets') === 'demo') Object.values(SECRETS).forEach((s, i) => {
@@ -1374,6 +1382,22 @@ function secretsVus(where){
     + vus.map(d => '<li>' + esc(SECRETS[d].secret) + '<small>' + esc(fmtLong(d)) + '</small></li>').join('') + '</ol>';
   where.append(det);
 }
+// Les secrets, à toute heure (bouton clé de l'en-tête) : le jeu du jour s'il n'est pas fini, puis tous les secrets connus
+function showSecrets(){
+  screen(); music(nuitTrack(), 'nuit');
+  const d = el('section', 'screen secrets-page');
+  d.innerHTML = '<h1 class="msg" tabindex="-1">Les secrets de Dieu</h1><p class="sub">Un jeu par jour, un secret à la clé. Ceux que tu as trouvés restent ici.</p>';
+  jeuDuJour(d);
+  const det = d.querySelector('.secrets-vus');
+  if(det) det.open = true;
+  else if(!SECRETS[ST.today] || !SECRETS[ST.today].secret){
+    d.append(el('p', 'attente', 'Pas de secret aujourd\'hui. Reviens demain.'));
+  }
+  const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
+  d.append(back);
+  view.append(d);
+  focusSoft(d.querySelector('h1'));
+}
 
 /* ---------- Écrans d'attente ---------- */
 function showSleep(){
@@ -1428,6 +1452,7 @@ function showSommaire(){
   d.append(ol);
   const ciel = el('button', 'nouv-etoile', '✦ Ton ciel · ' + lues + (lues > 1 ? ' étoiles' : ' étoile')); ciel.type = 'button'; ciel.style.margin = '0 auto 14px';
   ciel.onclick = () => { location.hash = 'ciel'; }; d.append(ciel);
+  if(!$('#bSec').hidden){ const sec = el('button', 'nouv-etoile', '🗝 Les secrets de Dieu'); sec.type = 'button'; sec.style.margin = '0 auto 14px'; sec.onclick = () => { location.hash = 'secrets'; }; d.append(sec); }
   boutonPlume(d);
   const back = el('button', 'lbtn', 'Revenir à ce soir'); back.type = 'button'; back.onclick = () => { location.hash = ''; };
   d.append(back); boutonNouveautes(d);
@@ -1613,6 +1638,10 @@ function showPage(p, opt){
   if(prev) nb('‹ ' + roman(prev.n), 'Page précédente, ' + prev.n, () => { location.hash = 'page-' + prev.n; });
   nb('Feuilleter le grimoire', null, () => { location.hash = 'sommaire'; });
   if(next) nb(roman(next.n) + ' ›', 'Page suivante, ' + next.n, () => { location.hash = 'page-' + next.n; });
+  if(!$('#bSec').hidden){
+    const j = SECRETS[ST.today], attend = j && j.secret && !(S.secrets || {})[ST.today];
+    nb(attend ? '🗝 Le secret du jour t\'attend' : '🗝 Les secrets', 'Les secrets de Dieu', () => { location.hash = 'secrets'; });
+  }
 
   let revealed = false;
   const c = {page:p, stage, reading, hint, alt, full, later, onAlt:null,
