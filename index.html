@@ -742,6 +742,32 @@ html.rm .reac button.pop{animation:none}
 .chat-ouvre video{max-width:min(100vw,100vh)}
 .chat-ouvre{transition:opacity .45s}
 .chat-ouvre.sort{opacity:0}
+
+/* Intro du 24/11 : le chat à caresser */
+.accueil-chat{background:#050403}
+.accueil-chat .chat-intro{position:absolute;left:50%;top:50%;z-index:1;width:min(100vw,72vh,620px);aspect-ratio:1;transform:translate(-50%,-46%);
+  padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.accueil-chat .chat-intro video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 50%,transparent 72%);mask-image:radial-gradient(circle at 50% 50%,#000 50%,transparent 72%)}
+.accueil-chat .voile{display:none}
+/* Le point lumineux posé sur le chat endormi : « touche ici » */
+.accueil-chat .patte{position:absolute;left:31%;top:44%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;pointer-events:none;
+  border:1.5px solid rgba(230,211,168,.75);box-shadow:0 0 18px rgba(230,190,110,.55),inset 0 0 14px rgba(230,190,110,.35);
+  opacity:0;animation:acc-in 1.2s 1.8s ease forwards,patte 2.2s 3s ease-in-out infinite}
+@keyframes patte{0%,100%{transform:scale(.85);opacity:.9}50%{transform:scale(1.15);opacity:.35}}
+.accueil-chat .invite{margin:0;font-style:italic;font-size:clamp(1.2rem,5.4vw,1.5rem);line-height:1.35;color:var(--gold-pale);opacity:0;animation:acc-in 1.4s 1.4s ease forwards;text-shadow:0 0 18px rgba(0,0,0,.9)}
+.accueil-chat.ouvre .patte{animation:none;opacity:0;transition:opacity .3s}
+html.rm .accueil-chat .patte{animation:none;opacity:.9}
+
+/* Geste de caresse : la traînée dorée, et le doigt qui montre le mouvement */
+.chat-btn,.chat-intro{touch-action:none;-webkit-user-select:none;user-select:none}
+canvas.trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;mix-blend-mode:screen}
+.accueil-chat .patte{animation:acc-in 1.2s 1.8s ease forwards,caresse-montre 2.6s 3s ease-in-out infinite}
+@keyframes caresse-montre{0%{transform:translateX(-26px) scale(.9);opacity:0}15%{opacity:.9}50%{transform:translateX(34px) scale(1);opacity:.9}65%{opacity:0}100%{transform:translateX(34px);opacity:0}}
+.accueil-chat .invite.secoue{animation:secoue .5s ease}
+@keyframes secoue{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.accueil-chat .invite{transition:color .4s}
+.accueil-chat .invite.ronron{color:#fff2cf}
 </style>
 </head>
 <body>
@@ -1675,7 +1701,7 @@ function chatTouchable(where){
     jouer('couche', {fin:() => { etat = 'dort'; }});   // il reste couché sur la dernière image
   };
   const eveiller = () => { etat = 'eveil'; jouer('eveil', {fin:attendre}); dire(RONRONS[nb % RONRONS.length]); };
-  b.onclick = () => {
+  const caresse = () => {
     if(secours){ b.classList.remove('eveil'); void b.offsetWidth; b.classList.add('eveil'); dire(RONRONS[nb++ % RONRONS.length], 1900); buzz([12, 40, 12]); ronron(); return; }
     buzz([12, 40, 12]);
     if(etat === 'dort' || etat === 'couche') eveiller();
@@ -1686,7 +1712,52 @@ function chatTouchable(where){
     }
     else { dire(MERCIS[nb % MERCIS.length]); nb++; }   // pendant le réveil ou une caresse : juste un petit mot
   };
+  caressable(b, {seuil:220, caresse,
+    // Tant qu'elle caresse, il ne se recouche pas
+    pendant:() => { if(etat === 'attend'){ clearTimeout(tAttente); tAttente = setTimeout(coucher, CHAT_PATIENCE); } },
+    tap:() => dire(etat === 'dort' || etat === 'couche' ? 'Caresse-moi du bout du doigt…' : 'Non, caresse-moi…', 2000)});
   b.chatOccupe = () => etat !== 'dort';
+}
+/* Le geste de caresse (24/11, demande d'Eliott) : un vrai mouvement du doigt sur le chat, comme la buée sur la vitre.
+   Une traînée dorée suit le doigt ; la caresse compte quand le doigt a parcouru `seuil` pixels.
+   opt : seuil, caresse() (geste complet), pendant(progression 0..1), tap() (simple toucher, sans glisser).
+   Au clavier (Entrée, Espace), le bouton déclenche directement la caresse. */
+function caressable(cible, opt){
+  const seuil = opt.seuil || 240;
+  const cv = el('canvas', 'trace'); cv.setAttribute('aria-hidden', 'true'); cible.append(cv);
+  const ctx = cv.getContext('2d'); let W = 0, H = 0, raf = 0, down = false, last = null, parcours = 0, total = 0;
+  const taille = () => { const b = cible.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1); W = b.width; H = b.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+  // La traînée s'efface doucement
+  const fondu = () => {
+    ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = 'rgba(0,0,0,.09)'; ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over';
+    raf = (down || parcours > 0) ? requestAnimationFrame(fondu) : 0;
+  };
+  const lueur = (x, y) => {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 22); g.addColorStop(0, 'rgba(255,226,160,.55)'); g.addColorStop(.5, 'rgba(230,190,110,.22)'); g.addColorStop(1, 'rgba(230,190,110,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 22, 0, 7); ctx.fill();
+    if(Math.random() < .35){ ctx.fillStyle = 'rgba(255,240,200,.9)'; ctx.beginPath(); ctx.arc(x + rnd(-14, 14), y + rnd(-14, 14), rnd(.6, 1.6), 0, 7); ctx.fill(); }
+  };
+  const pt = e => { const b = cv.getBoundingClientRect(); return {x:e.clientX - b.left, y:e.clientY - b.top}; };
+  cible.addEventListener('pointerdown', e => {
+    if(opt.actif && !opt.actif()) return;
+    e.preventDefault(); down = true; total = 0; last = pt(e); taille(); lueur(last.x, last.y);
+    try{ cible.setPointerCapture(e.pointerId); }catch(x){}
+    if(!raf) raf = requestAnimationFrame(fondu);
+  });
+  cible.addEventListener('pointermove', e => {
+    if(!down) return;
+    const q = pt(e), d = Math.hypot(q.x - last.x, q.y - last.y), n = Math.max(1, Math.ceil(d / 6));
+    for(let i = 1; i <= n; i++) lueur(last.x + (q.x - last.x) * i / n, last.y + (q.y - last.y) * i / n);
+    last = q; parcours += d; total += d;
+    if(Math.random() < .08) buzz(4);
+    if(opt.pendant) opt.pendant(Math.min(1, parcours / seuil));
+    if(parcours >= seuil){ parcours = 0; if(opt.caresse) opt.caresse(); }
+  });
+  const leve = () => { if(!down) return; down = false; if(total < 12 && opt.tap) opt.tap(); total = 0; setTimeout(() => { if(!down) parcours = 0; }, 1500); };
+  cible.addEventListener('pointerup', leve); cible.addEventListener('pointercancel', leve);
+  // Clavier seulement (un clic de souris ou de doigt est déjà traité par le geste)
+  cible.addEventListener('click', e => { if(e.detail === 0 && opt.caresse && (!opt.actif || opt.actif())) opt.caresse(); });
 }
 // « Page du soir » : le chat décroche le cachet de cire et ouvre le grimoire, puis la page d'attente
 function chatOuvreLeGrimoire(suite){
@@ -2730,13 +2801,14 @@ function showIntro(){
   music(null);
   screen();
   const d = el('div', 'accueil');
-  d.innerHTML = '<video class="boucle" src="accueil-boucle.mp4" poster="accueil-boucle.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>'
-    + '<video class="ouv" src="accueil-ouverture.mp4" muted playsinline preload="auto" aria-hidden="true"></video>'
+  // 24/11 : plus de livre qui s'ouvre tout seul. Elle caresse le chat endormi, et c'est lui qui décroche le cachet et ouvre le grimoire.
+  d.classList.add('accueil-chat');
+  d.innerHTML = '<button class="chat-intro" type="button" aria-label="Caresser le chat pour qu\'il t\'ouvre le grimoire (fais glisser ton doigt sur lui)">'
+    + '<video src="' + CHAT.cachet + '" poster="' + CHAT.dort + '" muted playsinline preload="auto" aria-hidden="true"></video>'
+    + '<span class="patte" aria-hidden="true"></span></button>'
     + '<div class="voile"></div>'
     + '<div class="haut"><small>Le Grimoire</small><h1 class="msg" tabindex="-1">' + (S.intro ? 'Ton grimoire t’attend, princesse.' : 'Un grimoire t’attend, princesse.') + '</h1></div>'
     + '<div class="bas"></div>';
-  const boucle = d.querySelector('.boucle'); boucle.muted = true;
-  const lb = boucle.play(); if(lb) lb.catch(() => {});
   let fini = false;
   const done = () => {
     if(fini) return; fini = true; introOn = false;
@@ -2745,19 +2817,23 @@ function showIntro(){
     const a = document.querySelector('.accueil'); if(a) a.remove();
     boot();
   };
-  const go = el('button', 'lbtn rouge', 'Ouvrir le grimoire'); go.type = 'button';
-  go.onclick = () => {
+  const go = d.querySelector('.chat-intro'), ouv = go.querySelector('video');
+  const ouvrir = () => {
     if(d.classList.contains('ouvre')) return;
     reveilSon();   // la musique démarre dans le grimoire (sauf si elle a coupé le son)
-    // 24/11 : plus de vidéo de la chouette. Le grimoire s'ouvre (5 s), puis on arrive directement à l'accueil
-    const ouv = d.querySelector('.ouv');
+    buzz([12, 40, 12]);
     d.classList.add('ouvre');
     if(RM){ done(); return; }
+    ouv.muted = !Snd.on;
     ouv.onended = done; ouv.onerror = done;
-    setTimeout(done, 6500);   // filet de sécurité
-    const po = ouv.play(); if(po) po.catch(done);
+    setTimeout(done, 9000);   // filet de sécurité
+    const po = ouv.play(); if(po) po.catch(() => { ouv.muted = true; ouv.play().catch(done); });
   };
-  d.querySelector('.bas').append(go);
+  const inv = () => d.querySelector('.invite');
+  caressable(go, {seuil:240, caresse:ouvrir, actif:() => !d.classList.contains('ouvre'),
+    pendant:p => { const i = inv(); if(i && p > .3) i.classList.add('ronron'); },
+    tap:() => { const i = inv(); if(i){ i.classList.remove('secoue'); void i.offsetWidth; i.classList.add('secoue'); } }});
+  d.querySelector('.bas').innerHTML = '<p class="invite">Caresse le chat du bout du doigt :<br>il t\'ouvrira le grimoire.</p>';
   document.body.append(d);
   focusSoft(d.querySelector('h1'));
 }
