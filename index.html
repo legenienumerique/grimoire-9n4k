@@ -768,6 +768,17 @@ canvas.trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:non
 @keyframes secoue{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 .accueil-chat .invite{transition:color .4s}
 .accueil-chat .invite.ronron{color:#fff2cf}
+
+/* Passage de l'ouverture à l'accueil : on entre dans la lumière du livre, puis la page apparaît */
+.accueil-chat::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at 50% 52%,rgba(255,236,190,.95) 0%,rgba(230,190,110,.55) 30%,rgba(5,4,3,0) 70%);transition:opacity .7s ease}
+.accueil-chat.fondu{opacity:0;transition:opacity 1.1s ease .55s;pointer-events:none}
+.accueil-chat.fondu::after{opacity:1}
+.accueil-chat.fondu .chat-intro video{transform:scale(1.18);filter:brightness(1.5) blur(1.5px);transition:transform 1.6s cubic-bezier(.3,.6,.3,1),filter 1.2s ease}
+.accueil-chat.fondu .haut,.accueil-chat.fondu .bas{opacity:0}
+#view.arrivee{animation:arrivee 1.6s ease .35s both}
+@keyframes arrivee{from{opacity:0;transform:translateY(10px) scale(.985);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+html.rm .accueil-chat.fondu,html.rm .accueil-chat.fondu video,html.rm #view.arrivee{transition:none;animation:none}
 </style>
 </head>
 <body>
@@ -2810,12 +2821,23 @@ function showIntro(){
     + '<div class="haut"><small>Le Grimoire</small><h1 class="msg" tabindex="-1">' + (S.intro ? 'Ton grimoire t’attend, princesse.' : 'Un grimoire t’attend, princesse.') + '</h1></div>'
     + '<div class="bas"></div>';
   let fini = false;
+  // On charge les pages pendant qu'elle caresse le chat (route() ne dessine rien tant que l'intro est là)
+  const pret = boot();
   const done = () => {
     if(fini) return; fini = true; introOn = false;
     S.intro = 1; saveS();
     try{ sessionStorage.setItem(INTRO_KEY, '1'); }catch(e){}
-    const a = document.querySelector('.accueil'); if(a) a.remove();
-    boot();
+    // 24/11 : plus de coupure sèche. L'accueil se prépare derrière, puis on plonge dans la lumière du livre ouvert
+    // et la page apparaît en fondu à travers elle.
+    const a = document.querySelector('.accueil');
+    Promise.resolve(pret).catch(() => {}).finally(() => {
+      route();   // les pages sont déjà chargées pendant l'intro : l'accueil s'affiche tout de suite
+      if(!a) return;
+      view.classList.remove('arrivee'); void view.offsetWidth; view.classList.add('arrivee');
+      setTimeout(() => view.classList.remove('arrivee'), 2200);
+      a.classList.add('fondu');
+      setTimeout(() => a.remove(), RM ? 0 : 1700);
+    });
   };
   const go = d.querySelector('.chat-intro'), ouv = go.querySelector('video');
   const ouvrir = () => {
@@ -2826,6 +2848,8 @@ function showIntro(){
     if(RM){ done(); return; }
     ouv.muted = !Snd.on;
     ouv.onended = done; ouv.onerror = done;
+    // Le fondu commence pendant la dernière seconde, quand la lumière monte des pages
+    ouv.addEventListener('timeupdate', () => { if(ouv.duration && ouv.currentTime > ouv.duration - 1.1) done(); });
     setTimeout(done, 9000);   // filet de sécurité
     const po = ouv.play(); if(po) po.catch(() => { ouv.muted = true; ouv.play().catch(done); });
   };
