@@ -42,6 +42,7 @@ if(/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacInt
    ========================================================= */
 const URL_FLUX_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTo1z90uspv1yqy0Mezyx_eKRYRdi0VbIKU1Fl_0wvDp01DBm4rf5-LsOQIqEGsSDuINfC32F5lRNNO/pub?gid=524656322&single=true&output=csv";        // lien CSV publié de l'onglet Flux (entre les guillemets)
 const HEURE_DEBLOCAGE = 21;     // heure locale du téléphone
+const URL_CONTE = "https://legenienumerique.github.io/rose-q7mwa2/"; // le conte, lié depuis la page de bascule (plus de carte QR)
 const DATE_RENCONTRE = "2026-11-29";    // la rencontre : la page finale s'ouvre la veille à 21 h
 const INSTAGRAM_DIEU = "only.goldrider";    // ton nom d'utilisateur Instagram, sans @ (le bouton ouvre ta conversation)
 const NUMERO_DIEU_MASQUE = "MTc5NzY3MjY2MzM=";   // ton numéro, brouillé pour les robots (pour le changer, demande à Claude)
@@ -533,6 +534,9 @@ body{font-size:17px;background:radial-gradient(ellipse 120% 60% at 50% -10%,#161
 .alt:hover,.lbtn:hover,.nouv-etoile:hover{background:rgba(201,169,110,.08);border-color:var(--gold)}
 .lbtn.rouge,.plume-btn{border-color:rgba(232,83,106,.6);background:rgba(139,0,0,.22);color:#fbe9ec}
 .lbtn.rouge:hover{background:rgba(139,0,0,.38)}
+.rose-lien{margin:34px auto 0;max-width:420px;text-align:center}
+.rose-lien p{margin:0 0 16px;font-style:italic;font-size:1.12rem;line-height:1.5}
+.rose-lien a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 .after{gap:12px}
 .rap-non{font-family:var(--serif);font-size:1.02rem;font-style:italic;text-underline-offset:4px;text-decoration-color:rgba(201,169,110,.5)}
 .chip{border-radius:2px;font-size:1.05rem;font-weight:600;border-color:rgba(242,235,224,.18);background:transparent}
@@ -2088,6 +2092,8 @@ function showPage(p, opt){
   const full = p.kind === 'fin' || p.kind === 'bascule' ? '' : citText(p.citation);
   if(p.kind === 'bascule'){
     reading.innerHTML = '<div class="mot final"><p>' + esc(p.texte) + '</p><p class="sig">Dieu</p></div>'
+      + '<div class="rose-lien"><p>Une dernière chose. Ce soir, un conte t\'attend. Il s\'appelle <i>La dernière rose</i>. Ouvre-le quand tu seras seule, avec le son : il est à toi.</p>'
+      + '<a class="lbtn rouge" href="' + URL_CONTE + '" target="_blank" rel="noopener">🌹 Ouvrir La dernière rose</a></div>'
       + '<p class="last">Le grimoire est à nous deux, maintenant.</p>';
   } else if(p.kind === 'fin'){
     reading.innerHTML = '<div class="mot final">' + (p.texte ? '<p>' + esc(p.texte) + '</p>' : '') + '<p class="sig">Dieu</p></div>'
