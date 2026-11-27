@@ -1790,14 +1790,15 @@ function caressable(cible, opt){
 function chatOuvreLeGrimoire(suite){
   if(RM){ suite(); return; }
   const w = el('div', 'intro-v chat-ouvre');
-  w.innerHTML = '<video playsinline preload="auto" src="' + CHAT.cachet + '" aria-hidden="true"></video><button class="intro-skip" type="button">Passer</button>';
+  // Vidéo toujours muette (demande d'Eliott du 27/11 : pas de son pour le chat à l'ouverture de la page du soir)
+  w.innerHTML = '<video playsinline muted preload="auto" src="' + CHAT.cachet + '" aria-hidden="true"></video><button class="intro-skip" type="button">Passer</button>';
   const v = w.querySelector('video');
   let fini = false;
   const fin = () => { if(fini) return; fini = true; w.classList.add('sort'); setTimeout(() => { w.remove(); }, 450); suite(); };
-  v.muted = !Snd.on; v.onended = fin; v.onerror = fin;
+  v.muted = true; v.onended = fin; v.onerror = fin;
   w.querySelector('.intro-skip').onclick = fin;
   document.body.append(w);
-  const pr = v.play(); if(pr) pr.catch(() => { v.muted = true; v.play().catch(fin); });
+  const pr = v.play(); if(pr) pr.catch(fin);
   setTimeout(fin, 9000);   // filet de sécurité
 }
 /* Idée 3 : un salut qui change avec l'heure */
